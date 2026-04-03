@@ -1,0 +1,35 @@
+/* index.css */
+/* Import App.css - must be first */
+@import './App.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles that should apply to everything */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Ensure proper height */
+#root {
+  min-height: 100vh;
+  width: 100%;
+}

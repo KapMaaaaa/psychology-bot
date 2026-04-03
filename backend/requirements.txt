@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+python-jose[cryptography]
+passlib[argon2]
+python-multipart
+openai
+python-dotenv
+fastapi-mail
+pydantic[email]
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+stripe

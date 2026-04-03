@@ -1,0 +1,1088 @@
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  ArrowLeft,
+  LogIn,
+  LogOut,
+  MessageCircle,
+  Moon,
+  Plus,
+  Send,
+  Sun,
+  User,
+  X
+} from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
+import AccountSettings from './AccountSettings'
+import Auth from './Auth'
+import CrisisResult from './CrisisResult'
+import CrisisSupport from './CrisisSupport'
+import SubscriptionResult from './SubscriptionResult'
+import { API_BASE_URL } from './config'
+import MarkdownRenderer from './MarkdownRenderer'
+
+// --- Types & Data ---
+type Language = 'ru' | 'kz' | 'en'
+
+type Theme = {
+  id: string
+  name: string
+  mode: 'light' | 'dark'
+  colors: {
+    bg: string
+    bgGradient?: string
+    text: string
+    textMuted: string
+    accent: string
+    accentGlow: string
+    border: string
+    cardBg: string
+    cardHover: string
+  }
+}
+
+const translations = {
+  ru: {
+    title: "Be Heard.",
+    begin: "Начать путь",
+    back: "Назад",
+    selectMentor: "Выберите наставника",
+    addCustom: "Добавить",
+    online: "В сети",
+    listening: "Слушаю",
+    clear: "Очистить",
+    placeholder: "Поделитесь мыслями...",
+    thinking: "Думает...",
+    newMentor: "Новый наставник",
+    name: "Имя",
+    desc: "Описание личности...",
+    cancel: "Отмена",
+    create: "Создать",
+    deepSession: "Глубокая сессия",
+    book: "Записаться к специалисту",
+    continueAi: "Продолжить с ИИ",
+    breathe: "Дышите",
+    guestReminder: "Создайте аккаунт, чтобы сохранить историю чата",
+    createAccount: "Создать аккаунт",
+    dismiss: "Закрыть",
+    myChats: "Мои чаты",
+    subscriptionRequired: "Требуется подписка",
+    subscriptionMessage: "Для продолжения общения необходима подписка",
+    subscribeNow: "Подписаться",
+    freeMessagesLimit: "Free messages remaining",
+    viewChats: "Chat History",
+    settings: "Settings",
+    logout: "Logout"
+  },
+  kz: {
+    title: "Be Heard.",
+    begin: "Жолды бастау",
+    back: "Артқа",
+    selectMentor: "Тәлімгерді таңдаңыз",
+    addCustom: "Қосу",
+    online: "Желіде",
+    listening: "Тыңдап тұрмын",
+    clear: "Тазалау",
+    placeholder: "Ойыңызбен бөлісіңіз...",
+    thinking: "Ойлануда...",
+    newMentor: "Жаңа тәлімгер",
+    name: "Есімі",
+    desc: "Тұлға сипаттамасы...",
+    cancel: "Бас тарту",
+    create: "Жасау",
+    deepSession: "Терең сессия",
+    book: "Маманға жазылу",
+    continueAi: "Интеллектпен жалғастыру",
+    breathe: "Дем алыңыз",
+    guestReminder: "Чат тарихын сақтау үшін аккаунт жасаңыз",
+    createAccount: "Аккаунт жасау",
+    dismiss: "Жабу",
+    myChats: "Менің чаттарым",
+    subscriptionRequired: "Жазылым қажет",
+    subscriptionMessage: "Қосымша сөйлесу үшін жазылым қажет",
+    subscribeNow: "Жазылу",
+    freeMessagesLimit: "Тегін хабарламалар қалды",
+    viewChats: "Чат тарихы",
+    settings: "Параметрлер",
+    logout: "Шығу"
+  },
+  en: {
+    title: "Be Heard.",
+    begin: "Begin Journey",
+    back: "Back",
+    selectMentor: "Choose a Mentor",
+    addCustom: "Add Custom",
+    online: "Online",
+    listening: "Listening",
+    clear: "Clear",
+    placeholder: "Share your thoughts...",
+    thinking: "Thinking...",
+    newMentor: "New Mentor",
+    name: "Name",
+    desc: "Personality description...",
+    cancel: "Cancel",
+    create: "Create",
+    deepSession: "Deep Session",
+    book: "Book Specialist",
+    continueAi: "Continue with AI",
+    breathe: "Breathe",
+    guestReminder: "Create an account to save your chat history",
+    createAccount: "Create Account",
+    dismiss: "Dismiss",
+    myChats: "My Chats",
+    subscriptionRequired: "Subscription Required",
+    subscriptionMessage: "Subscription required to continue chatting",
+    subscribeNow: "Subscribe Now",
+    freeMessagesLimit: "Free messages remaining",
+    viewChats: "Chat History"
+  }
+}
+
+const themes: Theme[] = [
+  {
+    id: 'light',
+    name: 'Light',
+    mode: 'light',
+    colors: {
+      bg: '#ffffff',
+      bgGradient: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+      text: '#1e293b',
+      textMuted: '#64748b',
+      accent: '#3b82f6',
+      accentGlow: 'rgba(59, 130, 246, 0.4)',
+      border: 'rgba(0, 0, 0, 0.08)',
+      cardBg: 'rgba(248, 250, 252, 0.6)',
+      cardHover: 'rgba(241, 245, 249, 0.8)',
+    },
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    mode: 'dark',
+    colors: {
+      bg: '#0a0a0a',
+      bgGradient: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+      text: '#fafafa',
+      textMuted: '#a3a3a3',
+      accent: '#14b8a6',
+      accentGlow: 'rgba(20, 184, 166, 0.6)',
+      border: 'rgba(255, 255, 255, 0.1)',
+      cardBg: 'rgba(255, 255, 255, 0.02)',
+      cardHover: 'rgba(255, 255, 255, 0.04)',
+    },
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    mode: 'dark',
+    colors: {
+      bg: '#020617',
+      bgGradient: 'linear-gradient(135deg, #020617 0%, #0c1a2e 100%)',
+      text: '#f0f9ff',
+      textMuted: '#bae6fd',
+      accent: '#38bdf8',
+      accentGlow: 'rgba(56, 189, 248, 0.6)',
+      border: 'rgba(240, 249, 255, 0.1)',
+      cardBg: 'rgba(255, 255, 255, 0.03)',
+      cardHover: 'rgba(255, 255, 255, 0.06)',
+    },
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender',
+    mode: 'dark',
+    colors: {
+      bg: '#0f0a15',
+      bgGradient: 'linear-gradient(135deg, #0f0a15 0%, #1a0f25 100%)',
+      text: '#faf5ff',
+      textMuted: '#e9d5ff',
+      accent: '#c084fc',
+      accentGlow: 'rgba(192, 132, 252, 0.6)',
+      border: 'rgba(250, 245, 255, 0.1)',
+      cardBg: 'rgba(255, 255, 255, 0.03)',
+      cardHover: 'rgba(255, 255, 255, 0.06)',
+    },
+  },
+]
+
+type Psychologist = {
+  id: string
+  name: string
+  specialty: string
+  image: string
+  desc?: string
+  initials?: string
+  gradient?: string
+  isCustom?: boolean
+}
+
+const DEFAULT_PSYCHOLOGISTS: Psychologist[] = [
+  { id: 'conor', name: 'Конор Макгрегор', specialty: 'Мотивация', initials: 'КМ', gradient: 'from-orange-500 to-red-600', image: 'https://i.pinimg.com/1200x/47/b5/f1/47b5f127e6fb07577ff159288d6b20be.jpg' },
+  { id: 'naruto', name: 'Наруто Узумаки', specialty: 'Поддержка', initials: 'НУ', gradient: 'from-yellow-400 to-orange-500', image: 'https://preview.redd.it/what-do-you-dislike-about-adult-naruto-s-design-v0-hrv9b6a06nzc1.jpeg?auto=webp&s=11c212db97db205e01a28de58c88bc51daf35b0d' },
+  { id: 'ronaldo', name: 'Криштиану Роналду', specialty: 'Дисциплина', initials: 'КР', gradient: 'from-red-500 to-purple-600', image: 'https://i.pinimg.com/originals/5f/6d/e5/5f6de5b18f033fd2226ed07b9784b820.jpg' },
+  { id: 'pro', name: 'Профессионал', specialty: 'Психология', initials: 'ПР', gradient: 'from-blue-400 to-indigo-600', image: 'https://i.pinimg.com/736x/62/d5/9e/62d59ed14cc28b96dff137ba84ea9b38.jpg' },
+]
+
+// User Menu Component
+function UserMenu({ user, onChatsClick, onSettingsClick, onLogout, theme, t }: {
+  user: { id: number, username: string },
+  onChatsClick: () => void,
+  onSettingsClick: () => void,
+  onLogout: () => void,
+  theme: Theme,
+  t: any
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="bg-black/10 backdrop-blur-md flex items-center gap-2 rounded-full border border-[var(--border-color)] px-3 py-2 hover:bg-[var(--card-hover)] transition-all"
+      >
+        <User size={14} style={{ color: 'var(--text-muted)' }} />
+        <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-color)' }}>
+          {user.username}
+        </span>
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute top-full right-0 mt-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl shadow-2xl z-50 min-w-[200px] overflow-hidden"
+            style={{
+              backgroundColor: theme.colors.cardBg,
+              borderColor: theme.colors.border
+            }}
+          >
+            <button
+              onClick={() => { onChatsClick(); setIsOpen(false); }}
+              className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[var(--card-hover)] transition-colors text-left"
+              style={{ color: 'var(--text-color)' }}
+            >
+              <MessageCircle size={16} />
+              <span className="text-sm">{t.viewChats}</span>
+            </button>
+            <button
+              onClick={() => { onSettingsClick(); setIsOpen(false); }}
+              className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[var(--card-hover)] transition-colors text-left"
+              style={{ color: 'var(--text-color)' }}
+            >
+              <User size={16} />
+              <span className="text-sm">{t.settings}</span>
+            </button>
+            <div className="h-px bg-[var(--border-color)]" />
+            <button
+              onClick={() => { onLogout(); setIsOpen(false); }}
+              className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[var(--card-hover)] transition-colors text-left"
+              style={{ color: 'var(--text-color)' }}
+            >
+              <LogOut size={16} />
+              <span className="text-sm">{t.logout}</span>
+            </button>
+          </motion.div>
+        </>
+      )}
+    </div>
+  )
+}
+
+export default function App() {
+  const [view, setView] = useState<'landing' | 'selection' | 'chat'>('landing');
+  const [lang, setLang] = useState<Language>('ru');
+  const [mode, setMode] = useState<'light' | 'dark'>('dark');
+  const [currentTheme, setCurrentTheme] = useState<Theme>(themes.find(t => t.id === 'midnight') || themes[0]);
+  const [psychs, setPsychs] = useState<Psychologist[]>([]);
+  const [selectedPsych, setSelectedPsych] = useState<Psychologist | null>(null);
+  const [messages, setMessages] = useState<{ role: 'user' | 'bot', content: string }[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showAccountSettings, setShowAccountSettings] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<{ id: number, username: string } | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [showGuestReminder, setShowGuestReminder] = useState(false);
+  const [showCrisisSupport, setShowCrisisSupport] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<{ status: string, expires_at: string | null } | null>(null);
+  const [messageCount, setMessageCount] = useState(0);
+  const [showChatHistory, setShowChatHistory] = useState(false);
+  const [userChats, setUserChats] = useState<Array<{ psych_id: string, last_message: string, message_count: number }>>([]);
+  const [subscriptionResult, setSubscriptionResult] = useState<'success' | 'cancel' | null>(null);
+  const [crisisResult, setCrisisResult] = useState<'success' | 'cancel' | null>(null);
+
+  const t = translations[lang];
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Навигация с поддержкой истории браузера
+  const navigateToView = (newView: 'landing' | 'selection' | 'chat', psychId?: string) => {
+    setView(newView);
+    // Обновляем URL без перезагрузки страницы
+    const url = psychId ? `#${newView}/${psychId}` : `#${newView}`;
+    window.history.pushState({ view: newView, psychId }, '', url);
+  };
+
+  // Обработка навигации назад/вперед
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state) {
+        setView(event.state.view);
+        if (event.state.psychId) {
+          const psych = psychs.find(p => p.id === event.state.psychId);
+          if (psych) {
+            setSelectedPsych(psych);
+          }
+        } else if (event.state.view !== 'chat') {
+          setSelectedPsych(null);
+        }
+      } else {
+        // Если нет state, проверяем hash в URL
+        const hash = window.location.hash.slice(1);
+        if (hash === 'selection') {
+          setView('selection');
+          setSelectedPsych(null);
+        } else if (hash === 'landing' || hash === '') {
+          setView('landing');
+          setSelectedPsych(null);
+        } else if (hash.startsWith('chat/')) {
+          const psychId = hash.split('/')[1];
+          const psych = psychs.find(p => p.id === psychId);
+          if (psych) {
+            setView('chat');
+            setSelectedPsych(psych);
+          }
+        }
+      }
+    };
+
+    // Инициализация из URL при загрузке
+    const hash = window.location.hash.slice(1);
+    if (hash === 'selection') {
+      setView('selection');
+    } else if (hash.startsWith('chat/')) {
+      const psychId = hash.split('/')[1];
+      const psych = psychs.find(p => p.id === psychId);
+      if (psych) {
+        setView('chat');
+        setSelectedPsych(psych);
+      }
+    } else {
+      setView('landing');
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [psychs]);
+
+  const loadSubscriptionStatus = async (authToken: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/subscription/status`, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSubscriptionStatus(data);
+      }
+    } catch (error) {
+      console.error('Failed to load subscription status:', error);
+    }
+  };
+
+  const loadUserChats = async () => {
+    if (!token) {
+      setShowAuth(true);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/chat/list`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserChats(data.chats || []);
+      } else if (response.status === 401) {
+        // Token expired, try to get error details
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Token expired or invalid:', errorData);
+        // Don't auto-logout, just show error
+        alert('Сессия истекла. Пожалуйста, войдите снова.');
+        handleLogout();
+      } else {
+        console.error('Failed to load chats:', response.status, await response.text().catch(() => ''));
+      }
+    } catch (error) {
+      console.error('Failed to load user chats:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedPsych) {
+      // Если пользователь авторизован, загружаем историю из БД
+      if (token && user) {
+        loadChatHistory(selectedPsych.id);
+      } else {
+        // Иначе из localStorage
+        const savedChat = localStorage.getItem(`chat_history_${selectedPsych.id}`);
+        setMessages(savedChat ? JSON.parse(savedChat) : []);
+      }
+    }
+  }, [selectedPsych, token, user]);
+
+  const loadChatHistory = async (psychId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/chat/history?psych_id=${psychId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data.history || []);
+      }
+    } catch (error) {
+      console.error('Failed to load chat history:', error);
+    }
+  };
+
+  // Load psychologists on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('my_psychologists');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as Psychologist[]
+        setPsychs(
+          parsed.map((p) => ({
+            ...p,
+            specialty: p.specialty ?? '',
+          }))
+        )
+      } catch (e) {
+        setPsychs(DEFAULT_PSYCHOLOGISTS);
+      }
+    } else {
+      setPsychs(DEFAULT_PSYCHOLOGISTS);
+    }
+  }, []);
+
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const savedToken = localStorage.getItem('auth_token');
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedToken && savedUser) {
+      setToken(savedToken);
+      setUser(JSON.parse(savedUser));
+      // Load subscription status
+      loadSubscriptionStatus(savedToken);
+    }
+  }, []);
+
+  // Check URL for subscription/crisis results on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathname = window.location.pathname;
+
+    // Handle subscription results
+    if (pathname === '/subscription/success') {
+      const sessionId = urlParams.get('session_id');
+      if (sessionId) {
+        setSubscriptionResult('success');
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+        // Verify and create subscription if needed
+        const savedToken = localStorage.getItem('auth_token') || token;
+        if (savedToken) {
+          // Verify session and create subscription
+          fetch(`${API_BASE_URL}/subscription/verify?session_id=${sessionId}`, {
+            headers: {
+              'Authorization': `Bearer ${savedToken}`
+            }
+          }).then(() => {
+            // Reload subscription status after verification
+            loadSubscriptionStatus(savedToken);
+          }).catch((error) => {
+            console.error('Failed to verify subscription:', error);
+            // Still reload status in case webhook already processed it
+            loadSubscriptionStatus(savedToken);
+          });
+        }
+      }
+    } else if (pathname === '/subscription/cancel') {
+      setSubscriptionResult('cancel');
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+    }
+
+    // Handle crisis results
+    if (pathname === '/crisis/success') {
+      const sessionId = urlParams.get('session_id');
+      if (sessionId) {
+        setCrisisResult('success');
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+      }
+    } else if (pathname === '/crisis/cancel') {
+      setCrisisResult('cancel');
+      // Clean URL
+      window.history.replaceState({}, '', '/');
+    }
+  }, []); // Run only once on mount
+
+  useEffect(() => {
+    if (selectedPsych && messages.length > 0) {
+      // Сохраняем в localStorage только если не авторизован
+      if (!token) {
+        localStorage.setItem(`chat_history_${selectedPsych.id}`, JSON.stringify(messages));
+      }
+      // Update message count
+      const userMessages = messages.filter(m => m.role === 'user').length;
+      setMessageCount(userMessages);
+    }
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages, selectedPsych, token]);
+
+  const handleToggleMode = () => {
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    setMode(newMode);
+    const firstTheme = themes.find(t => t.mode === newMode);
+    if (firstTheme) setCurrentTheme(firstTheme);
+  };
+
+  const handleClearChat = () => {
+    setMessages([]);
+    setMessageCount(0);
+    if (!token && selectedPsych) {
+      localStorage.removeItem(`chat_history_${selectedPsych.id}`);
+    }
+  };
+
+  const handleAuthSuccess = (authToken: string, userId: number, username: string) => {
+    setToken(authToken);
+    setUser({ id: userId, username });
+    localStorage.setItem('auth_token', authToken);
+    localStorage.setItem('auth_user', JSON.stringify({ id: userId, username }));
+    setShowGuestReminder(false);
+    loadSubscriptionStatus(authToken);
+    loadUserChats();
+    // Перезагружаем историю чата из БД
+    if (selectedPsych) {
+      loadChatHistory(selectedPsych.id);
+    }
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    setMessages([]);
+  };
+
+  const addCustomPsych = () => {
+    if (!newName || !newDesc) return;
+    const newPsych = {
+      id: `custom_${Date.now()}`,
+      name: newName,
+      specialty: 'Personal Mentor',
+      desc: newDesc,
+      initials: newName.substring(0, 2).toUpperCase(),
+      image: 'https://i.pinimg.com/736x/09/21/3d/09213d80309199aa75e8f6687d559400.jpg',
+      isCustom: true
+    };
+    const newList = [...psychs, newPsych];
+    setPsychs(newList);
+    localStorage.setItem('my_psychologists', JSON.stringify(newList));
+    setNewName(''); setNewDesc(''); setIsAdding(false);
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMsg = { role: 'user' as const, content: input };
+    const updatedHistory = [...messages, userMsg];
+    setMessages(updatedHistory);
+    setInput('');
+    setIsLoading(true);
+    setMessages((prev: { role: 'user' | 'bot', content: string }[]) => [...prev, { role: 'bot', content: '' }]);
+
+    // Show guest reminder after first message if not logged in
+    if (!token && !showGuestReminder && messages.length === 0) {
+      setTimeout(() => setShowGuestReminder(true), 2000);
+    }
+
+    try {
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          history: updatedHistory,
+          psych_id: selectedPsych?.id ?? 'psychologist',
+          custom_desc: selectedPsych?.desc,
+          lang: lang // Передаем язык на бэкенд
+        }),
+      });
+
+      // Проверяем статус 402 - требуется подписка
+      if (response.status === 402) {
+        const errorData = await response.json().catch(() => ({}));
+        setMessages((prev: { role: 'user' | 'bot', content: string }[]) => [...prev.slice(0, -1)]);
+        // Показываем предложение оформить подписку
+        setShowAccountSettings(true);
+        return;
+      }
+
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        let detail = errText.slice(0, 300);
+        try {
+          const j = JSON.parse(errText) as { detail?: unknown };
+          if (j.detail !== undefined) {
+            detail = typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail);
+          }
+        } catch {
+          /* use raw */
+        }
+        setMessages((prev: { role: 'user' | 'bot', content: string }[]) => [
+          ...prev.slice(0, -1),
+          { role: 'bot', content: `Ошибка сервера (${response.status}). ${detail}` },
+        ]);
+        return;
+      }
+
+      if (!response.body) {
+        setMessages((prev: { role: 'user' | 'bot', content: string }[]) => [...prev.slice(0, -1)]);
+        return;
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        accumulatedText += chunk;
+        setMessages((prev: { role: 'user' | 'bot', content: string }[]) => {
+          const newArr = [...prev];
+          newArr[newArr.length - 1].content = accumulatedText;
+          return newArr;
+        });
+      }
+
+      // Check if bot suggested psychologist (bot will say it in response)
+      // Only show crisis support if bot explicitly mentions the session offer
+      const crisisIndicators = ['1999', 'сессия', 'session', 'профессиональный психолог', 'professional psychologist'];
+      const hasCrisisOffer = crisisIndicators.some(indicator =>
+        accumulatedText.toLowerCase().includes(indicator.toLowerCase())
+      );
+
+      // Also check for explicit crisis language in bot's response
+      const explicitCrisisPhrases = [
+        'важно обратиться',
+        'критической ситуации',
+        'критическая ситуация',
+        'important to seek',
+        'critical situation'
+      ];
+      const hasExplicitCrisis = explicitCrisisPhrases.some(phrase =>
+        accumulatedText.toLowerCase().includes(phrase.toLowerCase())
+      );
+
+      if (hasCrisisOffer && hasExplicitCrisis) {
+        setTimeout(() => setShowCrisisSupport(true), 1500);
+      }
+
+    } catch (error) {
+      setMessages((prev: { role: 'user' | 'bot', content: string }[]) => [...prev.slice(0, -1), { role: 'bot', content: 'Connection Error.' }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <main
+      className="min-h-screen w-full flex flex-col items-center justify-center overflow-x-hidden relative transition-all duration-700 ease-in-out font-sans"
+      style={{
+        background: currentTheme.colors.bgGradient || currentTheme.colors.bg,
+        ['--text-color' as string]: currentTheme.colors.text,
+        ['--text-muted' as string]: currentTheme.colors.textMuted,
+        ['--accent-color' as string]: currentTheme.colors.accent,
+        ['--accent-glow' as string]: currentTheme.colors.accentGlow,
+        ['--border-color' as string]: currentTheme.colors.border,
+        ['--card-bg' as string]: currentTheme.colors.cardBg,
+        ['--card-hover' as string]: currentTheme.colors.cardHover,
+      } as React.CSSProperties & Record<string, string>}
+    >
+      {/* Controls: Mode & Language */}
+      <div className="fixed top-6 left-6 z-50 flex items-center gap-3">
+        <button onClick={handleToggleMode} className="bg-black/10 backdrop-blur-md p-2.5 rounded-full border border-[var(--border-color)] text-[var(--text-color)]">
+          {mode === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+        </button>
+        <div className="bg-black/10 backdrop-blur-md flex rounded-full border border-[var(--border-color)] p-1">
+          {(['kz', 'ru', 'en'] as Language[]).map(l => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${lang === l ? 'bg-[var(--accent-color)] text-white' : 'text-[var(--text-muted)]'}`}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Auth & Theme Switcher - Top Right */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
+        {user ? (
+          <div className="bg-black/10 backdrop-blur-md flex items-center gap-2 rounded-full border border-[var(--border-color)] px-3 py-2">
+            <button
+              onClick={() => { setShowChatHistory(true); loadUserChats(); }}
+              className="p-1.5 hover:bg-white/5 rounded-full transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              title={t.viewChats}
+            >
+              <MessageCircle size={16} />
+            </button>
+            <div className="w-px h-4 bg-[var(--border-color)]" />
+            <button
+              onClick={() => setShowAccountSettings(true)}
+              className="flex items-center gap-2 px-2 py-1 hover:bg-white/5 rounded-full transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              title="Настройки"
+            >
+              <User size={14} />
+              <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-color)' }}>
+                {user.username}
+              </span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-1 hover:bg-white/5 rounded-full transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+              title="Выйти"
+            >
+              <LogOut size={12} />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAuth(true)}
+            className="bg-black/10 backdrop-blur-md p-2.5 rounded-full border border-[var(--border-color)] text-[var(--text-color)] hover:bg-[var(--card-hover)] transition-all"
+            title="Войти"
+          >
+            <LogIn size={16} />
+          </button>
+        )}
+        <div className="flex gap-2 bg-black/10 backdrop-blur-md p-2 rounded-full border border-[var(--border-color)]">
+          {themes.filter(th => th.mode === mode).map(th => (
+            <button
+              key={th.id}
+              onClick={() => setCurrentTheme(th)}
+              className={`w-5 h-5 rounded-full border-2 ${currentTheme.id === th.id ? 'border-white scale-125' : 'border-transparent'}`}
+              style={{ backgroundColor: th.colors.accent }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {view === 'landing' && (
+          <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center z-10">
+            <h1 className="font-serif text-7xl md:text-9xl italic mb-8 tracking-tighter" style={{ color: 'var(--text-color)' }}>{t.title}</h1>
+            <button
+              onClick={() => navigateToView('selection')}
+              className="px-12 py-5 rounded-full border border-[var(--border-color)] text-[var(--text-muted)] uppercase tracking-[0.3em] text-[10px] hover:bg-[var(--card-hover)] transition-all"
+            >
+              {t.begin}
+            </button>
+          </motion.div>
+        )}
+
+        {view === 'selection' && (
+          <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl px-6 z-10">
+            <div className="flex items-center justify-between mb-12">
+              <button onClick={() => navigateToView('landing')} className="flex items-center gap-2 text-[var(--text-muted)] text-[10px] uppercase tracking-widest"><ArrowLeft size={14} /> {t.back}</button>
+              <h2 className="font-serif text-3xl italic" style={{ color: 'var(--text-color)' }}>{t.selectMentor}</h2>
+              <div className="w-10" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {psychs.map((p: Psychologist) => (
+                <div
+                  key={p.id}
+                  onClick={() => { setSelectedPsych(p); navigateToView('chat', p.id); }}
+                  className="relative p-8 rounded-[2.5rem] border border-[var(--border-color)] bg-[var(--card-bg)] hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center"
+                >
+                  <img src={p.image} className="w-24 h-24 rounded-full object-cover mb-6 border-4 border-[var(--border-color)]" alt="" />
+                  <h3 className="font-serif text-xl text-center" style={{ color: 'var(--text-color)' }}>{p.name}</h3>
+                  <p className="text-[9px] uppercase tracking-widest mt-2" style={{ color: 'var(--text-muted)' }}>{p.specialty}</p>
+                </div>
+              ))}
+              <button onClick={() => setIsAdding(true)} className="border-2 border-dashed border-[var(--border-color)] rounded-[2.5rem] flex flex-col items-center justify-center p-8 hover:bg-[var(--card-hover)] transition-all">
+                <Plus style={{ color: 'var(--text-muted)' }} />
+                <span className="text-[10px] uppercase tracking-widest mt-4" style={{ color: 'var(--text-muted)' }}>{t.addCustom}</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {view === 'chat' && (
+          <motion.div key="chat" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl h-[85vh] flex flex-col rounded-[3rem] border border-[var(--border-color)] bg-[var(--card-bg)] backdrop-blur-xl overflow-hidden shadow-2xl z-10">
+            <div className="p-6 border-b border-[var(--border-color)] flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button onClick={() => navigateToView('selection')} className="p-2 hover:bg-white/5 rounded-full transition-colors text-[var(--text-color)]"><ArrowLeft size={20} /></button>
+                <img src={selectedPsych?.image} className="w-10 h-10 rounded-full object-cover" alt="" />
+                <div>
+                  <h4 className="font-serif italic text-lg leading-tight" style={{ color: 'var(--text-color)' }}>{selectedPsych?.name}</h4>
+                  <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div><span className="text-[8px] uppercase tracking-tighter opacity-50" style={{ color: 'var(--text-color)' }}>{t.listening}</span></div>
+                </div>
+              </div>
+              <button onClick={handleClearChat} className="text-[8px] uppercase tracking-widest opacity-40 hover:opacity-100" style={{ color: 'var(--text-color)' }}>{t.clear}</button>
+            </div>
+
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-6">
+              {messages.map((m: { role: 'user' | 'bot', content: string }, i: number) => (
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] px-6 py-4 rounded-[2rem] text-sm leading-relaxed ${m.role === 'user'
+                    ? 'bg-[var(--accent-color)] text-white shadow-lg'
+                    : 'bg-[var(--card-hover)] border border-[var(--border-color)]'
+                    }`} style={{ color: m.role === 'user' ? '#fff' : 'var(--text-color)' }}>
+                    {m.role === 'bot' ? (
+                      <MarkdownRenderer 
+                        content={m.content} 
+                        style={{ color: 'inherit' }}
+                      />
+                    ) : (
+                      m.content
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isLoading && <div className="text-[10px] animate-pulse uppercase tracking-widest opacity-30" style={{ color: 'var(--text-color)' }}>{t.thinking}</div>}
+            </div>
+
+            <div className="p-6 bg-black/5">
+              {(subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token) && (
+                <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                  <p className="text-xs text-center" style={{ color: 'var(--text-color)' }}>
+                    {t.subscriptionRequired}. {t.subscriptionMessage}
+                  </p>
+                </div>
+              )}
+              <div className="relative flex items-end gap-2 bg-white/5 rounded-[2rem] p-2 border border-[var(--border-color)] focus-within:border-[var(--accent-color)] transition-all">
+                <textarea
+                  value={input} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
+                  placeholder={t.placeholder}
+                  className="chat-composer-textarea flex-1 bg-transparent border-none px-6 py-4 outline-none text-sm resize-none disabled:opacity-50 rounded-[2rem] overflow-x-hidden overflow-y-auto"
+                  style={{ color: 'var(--text-color)' }}
+                  disabled={subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token}
+                />
+                <button
+                  onClick={handleSend}
+                  className="p-4 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: 'var(--accent-color)', color: '#fff' }}
+                  disabled={subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token}
+                >
+                  <Send size={18} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {showAuth && (
+          <Auth
+            lang={lang}
+            onClose={() => setShowAuth(false)}
+            onSuccess={handleAuthSuccess}
+            theme={currentTheme}
+          />
+        )}
+
+
+        {showCrisisSupport && (
+          <CrisisSupport
+            lang={lang}
+            onClose={() => setShowCrisisSupport(false)}
+            onContinue={() => setShowCrisisSupport(false)}
+            theme={currentTheme}
+            token={token}
+          />
+        )}
+
+        {subscriptionResult && (
+          <SubscriptionResult
+            lang={lang}
+            theme={currentTheme}
+            type={subscriptionResult}
+            onClose={() => {
+              setSubscriptionResult(null);
+              if (subscriptionResult === 'success' && token) {
+                loadSubscriptionStatus(token);
+              }
+            }}
+            onGoToSettings={() => {
+              setSubscriptionResult(null);
+              setShowAccountSettings(true);
+            }}
+          />
+        )}
+
+        {crisisResult && (
+          <CrisisResult
+            lang={lang}
+            theme={currentTheme}
+            type={crisisResult}
+            onClose={() => setCrisisResult(null)}
+          />
+        )}
+
+        {showAccountSettings && (
+          <AccountSettings
+            lang={lang}
+            onClose={() => setShowAccountSettings(false)}
+            theme={currentTheme}
+            token={token}
+            onSubscriptionUpdate={() => {
+              if (token) {
+                loadSubscriptionStatus(token);
+              }
+            }}
+          />
+        )}
+
+        {showChatHistory && user && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6"
+            onClick={() => setShowChatHistory(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-[var(--card-bg)] border border-[var(--border-color)] p-10 rounded-[3rem] w-full max-w-2xl shadow-2xl max-h-[80vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-serif text-2xl italic" style={{ color: 'var(--text-color)' }}>{t.myChats}</h3>
+                <button
+                  onClick={() => setShowChatHistory(false)}
+                  className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              {userChats.length === 0 ? (
+                <p className="text-center text-sm opacity-50" style={{ color: 'var(--text-muted)' }}>
+                  Нет сохраненных чатов
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {userChats.map((chat) => {
+                    const psych = psychs.find(p => p.id === chat.psych_id) || DEFAULT_PSYCHOLOGISTS.find(p => p.id === chat.psych_id);
+                    return (
+                      <div
+                        key={chat.psych_id}
+                        onClick={() => {
+                          if (psych) {
+                            setSelectedPsych(psych);
+                            navigateToView('chat', chat.psych_id);
+                            setShowChatHistory(false);
+                          }
+                        }}
+                        className="p-4 rounded-2xl border border-[var(--border-color)] bg-[var(--card-hover)] hover:bg-[var(--card-bg)] cursor-pointer transition-all"
+                      >
+                        <div className="flex items-center gap-4">
+                          {psych && <img src={psych.image} className="w-12 h-12 rounded-full object-cover" alt="" />}
+                          <div className="flex-1">
+                            <h4 className="font-serif text-lg" style={{ color: 'var(--text-color)' }}>
+                              {psych?.name || chat.psych_id}
+                            </h4>
+                            <p className="text-xs opacity-60 mt-1 line-clamp-1" style={{ color: 'var(--text-muted)' }}>
+                              {chat.last_message}
+                            </p>
+                            <p className="text-[10px] opacity-40 mt-1" style={{ color: 'var(--text-muted)' }}>
+                              {chat.message_count} сообщений
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+
+        {isAdding && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
+            <div className="bg-[#111] border border-[var(--border-color)] p-10 rounded-[3rem] w-full max-w-md shadow-2xl">
+              <h3 className="font-serif text-2xl italic mb-6" style={{ color: '#fff' }}>{t.newMentor}</h3>
+              <input value={newName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)} placeholder={t.name} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
+              <textarea value={newDesc} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewDesc(e.target.value)} placeholder={t.desc} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-6 h-32 outline-none text-white resize-none" />
+              <div className="flex gap-4">
+                <button onClick={() => setIsAdding(false)} className="flex-1 py-4 text-white/40 uppercase tracking-widest text-[10px]">{t.cancel}</button>
+                <button onClick={addCustomPsych} className="flex-1 py-4 rounded-full text-white uppercase tracking-widest text-[10px] font-bold" style={{ backgroundColor: 'var(--accent-color)' }}>{t.create}</button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+      </AnimatePresence>
+
+      {/* Guest Reminder Banner */}
+      <AnimatePresence>
+        {showGuestReminder && !token && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl px-6 py-4 flex items-center gap-4 shadow-lg max-w-md"
+          >
+            <p className="text-sm flex-1" style={{ color: 'var(--text-color)' }}>
+              {t.guestReminder}
+            </p>
+            <button
+              onClick={() => setShowAuth(true)}
+              className="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider text-white"
+              style={{ backgroundColor: 'var(--accent-color)' }}
+            >
+              {t.createAccount}
+            </button>
+            <button
+              onClick={() => setShowGuestReminder(false)}
+              className="p-1 hover:bg-white/5 rounded-full transition-colors"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <footer className="fixed bottom-8 text-[9px] uppercase tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
+    </main>
+  )
+}
