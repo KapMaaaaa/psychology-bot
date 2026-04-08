@@ -218,7 +218,7 @@ type Psychologist = {
 
 const DEFAULT_PSYCHOLOGISTS: Psychologist[] = [
   { id: 'conor', name: 'Конор Макгрегор', specialty: 'Мотивация', initials: 'КМ', gradient: 'from-orange-500 to-red-600', image: 'https://i.pinimg.com/1200x/47/b5/f1/47b5f127e6fb07577ff159288d6b20be.jpg' },
-  { id: 'naruto', name: 'Наруто Узумаки', specialty: 'Поддержка', initials: 'НУ', gradient: 'from-yellow-400 to-orange-500', image: 'https://preview.redd.it/what-do-you-dislike-about-adult-naruto-s-design-v0-hrv9b6a06nzc1.jpeg?auto=webp&s=11c212db97db205e01a28de58c88bc51daf35b0d' },
+  { id: 'naruto', name: 'Обычный чел', specialty: 'Поддержка', initials: 'ОЧ', gradient: 'from-yellow-400 to-orange-500', image: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
   { id: 'ronaldo', name: 'Криштиану Роналду', specialty: 'Дисциплина', initials: 'КР', gradient: 'from-red-500 to-purple-600', image: 'https://i.pinimg.com/originals/5f/6d/e5/5f6de5b18f033fd2226ed07b9784b820.jpg' },
   { id: 'pro', name: 'Профессионал', specialty: 'Психология', initials: 'ПР', gradient: 'from-blue-400 to-indigo-600', image: 'https://i.pinimg.com/736x/62/d5/9e/62d59ed14cc28b96dff137ba84ea9b38.jpg' },
 ]
@@ -703,16 +703,27 @@ export default function App() {
       const decoder = new TextDecoder();
       let accumulatedText = "";
 
+      const pushBotText = (text: string) => {
+        setMessages((prev: { role: 'user' | 'bot', content: string }[]) => {
+          const newArr = [...prev];
+          newArr[newArr.length - 1].content = text;
+          return newArr;
+        });
+      };
+
+      const revealChunk = async (chunkText: string) => {
+        for (const ch of chunkText) {
+          accumulatedText += ch;
+          pushBotText(accumulatedText);
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        }
+      };
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value);
-        accumulatedText += chunk;
-        setMessages((prev: { role: 'user' | 'bot', content: string }[]) => {
-          const newArr = [...prev];
-          newArr[newArr.length - 1].content = accumulatedText;
-          return newArr;
-        });
+        await revealChunk(chunk);
       }
 
       // Check if bot suggested psychologist (bot will say it in response)
@@ -1107,7 +1118,8 @@ export default function App() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl px-6 py-4 flex items-center gap-4 shadow-lg max-w-md"
+            className="fixed bottom-24 right-6 z-40 border border-[var(--border-color)] rounded-2xl px-6 py-4 flex items-center gap-4 shadow-lg max-w-md"
+            style={{ backgroundColor: currentTheme.colors.bg }}
           >
             <p className="text-sm flex-1" style={{ color: 'var(--text-color)' }}>
               {t.guestReminder}
