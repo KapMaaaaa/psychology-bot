@@ -210,6 +210,7 @@ type Psychologist = {
   specialty: string
   image: string
   desc?: string
+  character?: string
   initials?: string
   gradient?: string
   isCustom?: boolean
@@ -305,6 +306,10 @@ export default function App() {
   const [showAccountSettings, setShowAccountSettings] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
+  const [newSpecialty, setNewSpecialty] = useState('');
+  const [newAvatar, setNewAvatar] = useState('');
+  const [newAvatarPreview, setNewAvatarPreview] = useState('');
+  const [newCharacter, setNewCharacter] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<{ id: number, username: string } | null>(null);
@@ -465,6 +470,8 @@ export default function App() {
           parsed.map((p) => ({
             ...p,
             specialty: p.specialty ?? '',
+            image: p.image ?? 'https://i.pinimg.com/736x/09/21/3d/09213d80309199aa75e8f6687d559400.jpg',
+            character: p.character ?? '',
           }))
         )
       } catch (e) {
@@ -590,19 +597,41 @@ export default function App() {
 
   const addCustomPsych = () => {
     if (!newName || !newDesc) return;
+    const finalAvatar = newAvatarPreview || newAvatar || 'https://i.pinimg.com/736x/09/21/3d/09213d80309199aa75e8f6687d559400.jpg';
     const newPsych = {
       id: `custom_${Date.now()}`,
       name: newName,
-      specialty: 'Personal Mentor',
+      specialty: newSpecialty || 'Personal Mentor',
       desc: newDesc,
+      character: newCharacter,
       initials: newName.substring(0, 2).toUpperCase(),
-      image: 'https://i.pinimg.com/736x/09/21/3d/09213d80309199aa75e8f6687d559400.jpg',
+      image: finalAvatar,
       isCustom: true
     };
     const newList = [...psychs, newPsych];
     setPsychs(newList);
     localStorage.setItem('my_psychologists', JSON.stringify(newList));
-    setNewName(''); setNewDesc(''); setIsAdding(false);
+    setNewName('');
+    setNewSpecialty('');
+    setNewAvatar('');
+    setNewAvatarPreview('');
+    setNewCharacter('');
+    setNewDesc('');
+    setIsAdding(false);
+  };
+
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setNewAvatarPreview(reader.result);
+        setNewAvatar('');
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSend = async () => {
@@ -632,7 +661,9 @@ export default function App() {
         body: JSON.stringify({
           history: updatedHistory,
           psych_id: selectedPsych?.id ?? 'psychologist',
-          custom_desc: selectedPsych?.desc,
+          custom_desc: selectedPsych
+            ? `${selectedPsych.desc ?? ''}\nХарактер: ${selectedPsych.character ?? ''}\nРоль: ${selectedPsych.specialty ?? ''}`.trim()
+            : undefined,
           lang: lang // Передаем язык на бэкенд
         }),
       });
@@ -1038,9 +1069,26 @@ export default function App() {
 
         {isAdding && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-            <div className="bg-[#111] border border-[var(--border-color)] p-10 rounded-[3rem] w-full max-w-md shadow-2xl">
+            <div className="bg-[#111] border border-[var(--border-color)] p-10 rounded-[3rem] w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="font-serif text-2xl italic mb-6" style={{ color: '#fff' }}>{t.newMentor}</h3>
               <input value={newName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)} placeholder={t.name} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
+              <input value={newSpecialty} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSpecialty(e.target.value)} placeholder={lang === 'ru' ? 'Роль / специализация' : lang === 'kz' ? 'Рөл / мамандану' : 'Role / specialty'} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
+              <input value={newAvatar} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewAvatar(e.target.value)} placeholder={lang === 'ru' ? 'Ссылка на аватар (URL)' : lang === 'kz' ? 'Аватар сілтемесі (URL)' : 'Avatar URL'} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
+              <input type="file" accept="image/*" onChange={handleAvatarFileChange} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-4 py-3 mb-4 outline-none text-white file:mr-3 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-1 file:text-xs file:text-white" />
+              {(newAvatarPreview || newAvatar) && (
+                <div className="mb-4 flex items-center gap-3">
+                  <img src={newAvatarPreview || newAvatar} className="w-14 h-14 rounded-full object-cover border border-[var(--border-color)]" alt="avatar preview" />
+                  <button
+                    type="button"
+                    onClick={() => { setNewAvatar(''); setNewAvatarPreview(''); }}
+                    className="text-xs uppercase tracking-widest opacity-70 hover:opacity-100"
+                    style={{ color: '#fff' }}
+                  >
+                    {lang === 'ru' ? 'Очистить аватар' : lang === 'kz' ? 'Аватарды тазалау' : 'Clear avatar'}
+                  </button>
+                </div>
+              )}
+              <textarea value={newCharacter} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewCharacter(e.target.value)} placeholder={lang === 'ru' ? 'Характер персонажа (как он общается)' : lang === 'kz' ? 'Кейіпкер мінезі (қалай сөйлейді)' : 'Character style (how this persona speaks)'} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 h-24 outline-none text-white resize-none" />
               <textarea value={newDesc} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewDesc(e.target.value)} placeholder={t.desc} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-6 h-32 outline-none text-white resize-none" />
               <div className="flex gap-4">
                 <button onClick={() => setIsAdding(false)} className="flex-1 py-4 text-white/40 uppercase tracking-widest text-[10px]">{t.cancel}</button>

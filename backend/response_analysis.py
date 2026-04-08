@@ -97,22 +97,17 @@ def analyze_response_for_chat(last_user_message: str) -> ChatResponseAnalysis:
     """
     Правила:
     - risk == high → mode escalation
-    - risk == medium и detected == support → mode reflection
     - иначе mode = detected
     """
     risk = simple_risk_check(last_user_message)
     detected = detect_response_mode(last_user_message)
 
-    upgraded = False
     if risk == "high":
         mode = "escalation"
-    elif risk == "medium" and detected == "support":
-        mode = "reflection"
-        upgraded = True
     else:
         mode = detected
 
-    reason = _compose_reason(risk, detected, mode, upgraded)
+    reason = _compose_reason(risk, detected, mode, False)
 
     # high → всегда; medium + явный сильный дистресс → да; иначе нет
     needs_human = risk == "high" or (
