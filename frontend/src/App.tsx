@@ -68,7 +68,7 @@ const translations = {
     navMenu: "Меню",
     heroEyebrow: "Платформа эмоциональной поддержки",
     sectionFeaturesTitle: "Почему Be Heard",
-    sectionHowTitle: "Как это работает",
+    sectionHowTitle: "Как это работает?",
     sectionTrustTitle: "Конфиденциальность",
     sectionFaqTitle: "Частые вопросы",
     howStep1Title: "Выберите наставника",
