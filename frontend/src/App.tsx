@@ -728,7 +728,16 @@ export default function App() {
 
       // Check if bot suggested psychologist (bot will say it in response)
       // Only show crisis support if bot explicitly mentions the session offer
-      const crisisIndicators = ['1999', 'сессия', 'session', 'профессиональный психолог', 'professional psychologist'];
+      const crisisIndicators = [
+        '1999',
+        'сессия',
+        'session',
+        'профессиональный психолог',
+        'professional psychologist',
+        'реальному психологу',
+        'психотерапевту',
+        'real psychologist',
+      ];
       const hasCrisisOffer = crisisIndicators.some(indicator =>
         accumulatedText.toLowerCase().includes(indicator.toLowerCase())
       );
@@ -771,16 +780,16 @@ export default function App() {
       } as React.CSSProperties & Record<string, string>}
     >
       {/* Controls: Mode & Language */}
-      <div className="fixed top-6 left-6 z-50 flex items-center gap-3">
-        <button onClick={handleToggleMode} className="bg-black/10 backdrop-blur-md p-2.5 rounded-full border border-[var(--border-color)] text-[var(--text-color)]">
+      <div className="fixed top-3 left-3 sm:top-6 sm:left-6 z-50 flex items-center gap-2 sm:gap-3">
+        <button onClick={handleToggleMode} className="bg-black/10 backdrop-blur-md p-2 sm:p-2.5 rounded-full border border-[var(--border-color)] text-[var(--text-color)]">
           {mode === 'light' ? <Moon size={16} /> : <Sun size={16} />}
         </button>
-        <div className="bg-black/10 backdrop-blur-md flex rounded-full border border-[var(--border-color)] p-1">
+        <div className="bg-black/10 backdrop-blur-md flex rounded-full border border-[var(--border-color)] p-0.5 sm:p-1">
           {(['kz', 'ru', 'en'] as Language[]).map(l => (
             <button
               key={l}
               onClick={() => setLang(l)}
-              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${lang === l ? 'bg-[var(--accent-color)] text-white' : 'text-[var(--text-muted)]'}`}
+              className={`px-2 sm:px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase transition-all ${lang === l ? 'bg-[var(--accent-color)] text-white' : 'text-[var(--text-muted)]'}`}
             >
               {l}
             </button>
@@ -789,7 +798,7 @@ export default function App() {
       </div>
 
       {/* Auth & Theme Switcher - Top Right */}
-      <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
+      <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50 flex items-center gap-2 sm:gap-3">
         {user ? (
           <div className="bg-black/10 backdrop-blur-md flex items-center gap-2 rounded-full border border-[var(--border-color)] px-3 py-2">
             <button
@@ -830,12 +839,12 @@ export default function App() {
             <LogIn size={16} />
           </button>
         )}
-        <div className="flex gap-2 bg-black/10 backdrop-blur-md p-2 rounded-full border border-[var(--border-color)]">
+        <div className="flex gap-1.5 sm:gap-2 bg-black/10 backdrop-blur-md p-1.5 sm:p-2 rounded-full border border-[var(--border-color)]">
           {themes.filter(th => th.mode === mode).map(th => (
             <button
               key={th.id}
               onClick={() => setCurrentTheme(th)}
-              className={`w-5 h-5 rounded-full border-2 ${currentTheme.id === th.id ? 'border-white scale-125' : 'border-transparent'}`}
+              className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 ${currentTheme.id === th.id ? 'border-white scale-125' : 'border-transparent'}`}
               style={{ backgroundColor: th.colors.accent }}
             />
           ))}
@@ -844,11 +853,11 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {view === 'landing' && (
-          <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center z-10">
-            <h1 className="font-serif text-7xl md:text-9xl italic mb-8 tracking-tighter" style={{ color: 'var(--text-color)' }}>{t.title}</h1>
+          <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center z-10 px-4">
+            <h1 className="font-serif text-5xl sm:text-7xl md:text-9xl italic mb-6 sm:mb-8 tracking-tighter" style={{ color: 'var(--text-color)' }}>{t.title}</h1>
             <button
               onClick={() => navigateToView('selection')}
-              className="px-12 py-5 rounded-full border border-[var(--border-color)] text-[var(--text-muted)] uppercase tracking-[0.3em] text-[10px] hover:bg-[var(--card-hover)] transition-all"
+              className="px-8 sm:px-12 py-4 sm:py-5 rounded-full border border-[var(--border-color)] text-[var(--text-muted)] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[10px] hover:bg-[var(--card-hover)] transition-all"
             >
               {t.begin}
             </button>
@@ -856,25 +865,25 @@ export default function App() {
         )}
 
         {view === 'selection' && (
-          <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl px-6 z-10">
-            <div className="flex items-center justify-between mb-12">
+          <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl px-4 sm:px-6 z-10 pt-16 sm:pt-0">
+            <div className="flex items-center justify-between mb-8 sm:mb-12">
               <button onClick={() => navigateToView('landing')} className="flex items-center gap-2 text-[var(--text-muted)] text-[10px] uppercase tracking-widest"><ArrowLeft size={14} /> {t.back}</button>
-              <h2 className="font-serif text-3xl italic" style={{ color: 'var(--text-color)' }}>{t.selectMentor}</h2>
-              <div className="w-10" />
+              <h2 className="font-serif text-xl sm:text-3xl italic text-center px-2" style={{ color: 'var(--text-color)' }}>{t.selectMentor}</h2>
+              <div className="w-6 sm:w-10" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {psychs.map((p: Psychologist) => (
                 <div
                   key={p.id}
                   onClick={() => { setSelectedPsych(p); navigateToView('chat', p.id); }}
-                  className="relative p-8 rounded-[2.5rem] border border-[var(--border-color)] bg-[var(--card-bg)] hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center"
+                  className="relative p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-[var(--border-color)] bg-[var(--card-bg)] hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center"
                 >
-                  <img src={p.image} className="w-24 h-24 rounded-full object-cover mb-6 border-4 border-[var(--border-color)]" alt="" />
-                  <h3 className="font-serif text-xl text-center" style={{ color: 'var(--text-color)' }}>{p.name}</h3>
+                  <img src={p.image} className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover mb-4 sm:mb-6 border-4 border-[var(--border-color)]" alt="" />
+                  <h3 className="font-serif text-lg sm:text-xl text-center" style={{ color: 'var(--text-color)' }}>{p.name}</h3>
                   <p className="text-[9px] uppercase tracking-widest mt-2" style={{ color: 'var(--text-muted)' }}>{p.specialty}</p>
                 </div>
               ))}
-              <button onClick={() => setIsAdding(true)} className="border-2 border-dashed border-[var(--border-color)] rounded-[2.5rem] flex flex-col items-center justify-center p-8 hover:bg-[var(--card-hover)] transition-all">
+              <button onClick={() => setIsAdding(true)} className="border-2 border-dashed border-[var(--border-color)] rounded-[2rem] sm:rounded-[2.5rem] flex flex-col items-center justify-center p-6 sm:p-8 hover:bg-[var(--card-hover)] transition-all">
                 <Plus style={{ color: 'var(--text-muted)' }} />
                 <span className="text-[10px] uppercase tracking-widest mt-4" style={{ color: 'var(--text-muted)' }}>{t.addCustom}</span>
               </button>
@@ -883,23 +892,23 @@ export default function App() {
         )}
 
         {view === 'chat' && (
-          <motion.div key="chat" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl h-[85vh] flex flex-col rounded-[3rem] border border-[var(--border-color)] bg-[var(--card-bg)] backdrop-blur-xl overflow-hidden shadow-2xl z-10">
-            <div className="p-6 border-b border-[var(--border-color)] flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <button onClick={() => navigateToView('selection')} className="p-2 hover:bg-white/5 rounded-full transition-colors text-[var(--text-color)]"><ArrowLeft size={20} /></button>
-                <img src={selectedPsych?.image} className="w-10 h-10 rounded-full object-cover" alt="" />
+          <motion.div key="chat" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl h-[100dvh] sm:h-[85vh] flex flex-col rounded-none sm:rounded-[3rem] border-0 sm:border border-[var(--border-color)] bg-[var(--card-bg)] backdrop-blur-xl overflow-hidden shadow-none sm:shadow-2xl z-10">
+            <div className="p-4 sm:p-6 border-b border-[var(--border-color)] flex items-center justify-between pt-16 sm:pt-6">
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                <button onClick={() => navigateToView('selection')} className="p-2 hover:bg-white/5 rounded-full transition-colors text-[var(--text-color)]"><ArrowLeft size={18} /></button>
+                <img src={selectedPsych?.image} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover" alt="" />
                 <div>
-                  <h4 className="font-serif italic text-lg leading-tight" style={{ color: 'var(--text-color)' }}>{selectedPsych?.name}</h4>
+                  <h4 className="font-serif italic text-base sm:text-lg leading-tight line-clamp-1" style={{ color: 'var(--text-color)' }}>{selectedPsych?.name}</h4>
                   <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div><span className="text-[8px] uppercase tracking-tighter opacity-50" style={{ color: 'var(--text-color)' }}>{t.listening}</span></div>
                 </div>
               </div>
               <button onClick={handleClearChat} className="text-[8px] uppercase tracking-widest opacity-40 hover:opacity-100" style={{ color: 'var(--text-color)' }}>{t.clear}</button>
             </div>
 
-            <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-6">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 sm:space-y-6">
               {messages.map((m: { role: 'user' | 'bot', content: string }, i: number) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-6 py-4 rounded-[2rem] text-sm leading-relaxed ${m.role === 'user'
+                  <div className={`max-w-[90%] sm:max-w-[85%] px-4 sm:px-6 py-3 sm:py-4 rounded-[1.5rem] sm:rounded-[2rem] text-sm leading-relaxed ${m.role === 'user'
                     ? 'bg-[var(--accent-color)] text-white shadow-lg'
                     : 'bg-[var(--card-hover)] border border-[var(--border-color)]'
                     }`} style={{ color: m.role === 'user' ? '#fff' : 'var(--text-color)' }}>
@@ -917,7 +926,7 @@ export default function App() {
               {isLoading && <div className="text-[10px] animate-pulse uppercase tracking-widest opacity-30" style={{ color: 'var(--text-color)' }}>{t.thinking}</div>}
             </div>
 
-            <div className="p-6 bg-black/5">
+            <div className="p-4 sm:p-6 bg-black/5">
               {(subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token) && (
                 <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
                   <p className="text-xs text-center" style={{ color: 'var(--text-color)' }}>
@@ -925,22 +934,22 @@ export default function App() {
                   </p>
                 </div>
               )}
-              <div className="relative flex items-end gap-2 bg-white/5 rounded-[2rem] p-2 border border-[var(--border-color)] focus-within:border-[var(--accent-color)] transition-all">
+              <div className="relative flex items-end gap-2 bg-white/5 rounded-[1.5rem] sm:rounded-[2rem] p-1.5 sm:p-2 border border-[var(--border-color)] focus-within:border-[var(--accent-color)] transition-all">
                 <textarea
                   value={input} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
                   placeholder={t.placeholder}
-                  className="chat-composer-textarea flex-1 bg-transparent border-none px-6 py-4 outline-none text-sm resize-none disabled:opacity-50 rounded-[2rem] overflow-x-hidden overflow-y-auto"
+                  className="chat-composer-textarea flex-1 bg-transparent border-none px-4 sm:px-6 py-3 sm:py-4 outline-none text-sm resize-none disabled:opacity-50 rounded-[1.5rem] sm:rounded-[2rem] overflow-x-hidden overflow-y-auto"
                   style={{ color: 'var(--text-color)' }}
                   disabled={subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token}
                 />
                 <button
                   onClick={handleSend}
-                  className="p-4 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-3 sm:p-4 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ backgroundColor: 'var(--accent-color)', color: '#fff' }}
                   disabled={subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token}
                 >
-                  <Send size={18} />
+                  <Send size={16} />
                 </button>
               </div>
             </div>
@@ -1016,17 +1025,17 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-6"
             onClick={() => setShowChatHistory(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-[var(--card-bg)] border border-[var(--border-color)] p-10 rounded-[3rem] w-full max-w-2xl shadow-2xl max-h-[80vh] overflow-y-auto"
+              className="bg-[var(--card-bg)] border border-[var(--border-color)] p-5 sm:p-10 rounded-[1.75rem] sm:rounded-[3rem] w-full max-w-2xl shadow-2xl max-h-[85vh] sm:max-h-[80vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-serif text-2xl italic" style={{ color: 'var(--text-color)' }}>{t.myChats}</h3>
+                <h3 className="font-serif text-xl sm:text-2xl italic" style={{ color: 'var(--text-color)' }}>{t.myChats}</h3>
                 <button
                   onClick={() => setShowChatHistory(false)}
                   className="p-2 hover:bg-white/5 rounded-full transition-colors"
@@ -1079,9 +1088,9 @@ export default function App() {
         )}
 
         {isAdding && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-            <div className="bg-[#111] border border-[var(--border-color)] p-10 rounded-[3rem] w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
-              <h3 className="font-serif text-2xl italic mb-6" style={{ color: '#fff' }}>{t.newMentor}</h3>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-3 sm:p-6">
+            <div className="bg-[#111] border border-[var(--border-color)] p-5 sm:p-10 rounded-[1.75rem] sm:rounded-[3rem] w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+              <h3 className="font-serif text-xl sm:text-2xl italic mb-5 sm:mb-6" style={{ color: '#fff' }}>{t.newMentor}</h3>
               <input value={newName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewName(e.target.value)} placeholder={t.name} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
               <input value={newSpecialty} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewSpecialty(e.target.value)} placeholder={lang === 'ru' ? 'Роль / специализация' : lang === 'kz' ? 'Рөл / мамандану' : 'Role / specialty'} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
               <input value={newAvatar} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewAvatar(e.target.value)} placeholder={lang === 'ru' ? 'Ссылка на аватар (URL)' : lang === 'kz' ? 'Аватар сілтемесі (URL)' : 'Avatar URL'} className="w-full bg-white/5 border border-[var(--border-color)] rounded-2xl px-6 py-4 mb-4 outline-none text-white" />
@@ -1118,7 +1127,7 @@ export default function App() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-24 right-6 z-40 border border-[var(--border-color)] rounded-2xl px-6 py-4 flex items-center gap-4 shadow-lg max-w-md"
+            className="fixed bottom-4 left-3 right-3 sm:bottom-24 sm:left-auto sm:right-6 z-40 border border-[var(--border-color)] rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 shadow-lg w-auto sm:max-w-md"
             style={{ backgroundColor: currentTheme.colors.bg }}
           >
             <p className="text-sm flex-1" style={{ color: 'var(--text-color)' }}>
@@ -1142,7 +1151,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <footer className="fixed bottom-8 text-[9px] uppercase tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
+      <footer className="fixed bottom-2 sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
     </main>
   )
 }
