@@ -780,7 +780,7 @@ export default function App() {
       } as React.CSSProperties & Record<string, string>}
     >
       {/* Controls: Mode & Language */}
-      <div className="fixed top-3 left-3 sm:top-6 sm:left-6 z-50 flex items-center gap-2 sm:gap-3">
+      <div className="fixed top-[calc(0.75rem+env(safe-area-inset-top,0px))] left-[calc(0.75rem+env(safe-area-inset-left,0px))] sm:top-6 sm:left-6 z-50 flex items-center gap-2 sm:gap-3">
         <button onClick={handleToggleMode} className="bg-black/10 backdrop-blur-md p-2 sm:p-2.5 rounded-full border border-[var(--border-color)] text-[var(--text-color)]">
           {mode === 'light' ? <Moon size={16} /> : <Sun size={16} />}
         </button>
@@ -798,7 +798,7 @@ export default function App() {
       </div>
 
       {/* Auth & Theme Switcher - Top Right */}
-      <div className="fixed top-3 right-3 sm:top-6 sm:right-6 z-50 flex items-center gap-2 sm:gap-3">
+      <div className="fixed top-[calc(0.75rem+env(safe-area-inset-top,0px))] right-[calc(0.75rem+env(safe-area-inset-right,0px))] sm:top-6 sm:right-6 z-50 flex items-center gap-2 sm:gap-3">
         {user ? (
           <div className="bg-black/10 backdrop-blur-md flex items-center gap-2 rounded-full border border-[var(--border-color)] px-3 py-2">
             <button
@@ -853,7 +853,7 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {view === 'landing' && (
-          <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center z-10 px-4">
+          <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center z-10 px-4 pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pt-0">
             <h1 className="font-serif text-5xl sm:text-7xl md:text-9xl italic mb-6 sm:mb-8 tracking-tighter" style={{ color: 'var(--text-color)' }}>{t.title}</h1>
             <button
               onClick={() => navigateToView('selection')}
@@ -865,7 +865,7 @@ export default function App() {
         )}
 
         {view === 'selection' && (
-          <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl px-4 sm:px-6 z-10 pt-16 sm:pt-0">
+          <motion.div key="selection" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl px-4 sm:px-6 z-10 pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pt-0">
             <div className="flex items-center justify-between mb-8 sm:mb-12">
               <button onClick={() => navigateToView('landing')} className="flex items-center gap-2 text-[var(--text-muted)] text-[10px] uppercase tracking-widest"><ArrowLeft size={14} /> {t.back}</button>
               <h2 className="font-serif text-xl sm:text-3xl italic text-center px-2" style={{ color: 'var(--text-color)' }}>{t.selectMentor}</h2>
@@ -893,7 +893,7 @@ export default function App() {
 
         {view === 'chat' && (
           <motion.div key="chat" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-2xl h-[100dvh] sm:h-[85vh] flex flex-col rounded-none sm:rounded-[3rem] border-0 sm:border border-[var(--border-color)] bg-[var(--card-bg)] backdrop-blur-xl overflow-hidden shadow-none sm:shadow-2xl z-10">
-            <div className="p-4 sm:p-6 border-b border-[var(--border-color)] flex items-center justify-between pt-16 sm:pt-6">
+            <div className="p-4 sm:p-6 border-b border-[var(--border-color)] flex items-center justify-between pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pt-6">
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 <button onClick={() => navigateToView('selection')} className="p-2 hover:bg-white/5 rounded-full transition-colors text-[var(--text-color)]"><ArrowLeft size={18} /></button>
                 <img src={selectedPsych?.image} className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover" alt="" />
@@ -1127,7 +1127,7 @@ export default function App() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-4 left-3 right-3 sm:bottom-24 sm:left-auto sm:right-6 z-40 border border-[var(--border-color)] rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 shadow-lg w-auto sm:max-w-md"
+            className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-3 right-3 sm:bottom-24 sm:left-auto sm:right-6 z-40 border border-[var(--border-color)] rounded-2xl px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 shadow-lg w-auto sm:max-w-md"
             style={{ backgroundColor: currentTheme.colors.bg }}
           >
             <p className="text-sm flex-1" style={{ color: 'var(--text-color)' }}>
@@ -1151,7 +1151,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <footer className="fixed bottom-2 sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
+      <footer className="fixed bottom-[calc(0.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
     </main>
   )
 }
