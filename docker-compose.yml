@@ -27,6 +27,8 @@ services:
       # Браузер ходит на тот же хост:3000 → /api/*, Vite проксирует в сервис backend
       - VITE_API_BASE_URL=/api
       - API_PROXY_TARGET=http://backend:8000
+      # Vite: polling for file changes + HMR ws через проброшенный порт (см. frontend/vite.config.ts)
+      - DOCKER_DEV=1
     restart: always
 
 volumes:

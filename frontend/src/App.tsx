@@ -1,12 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft,
+  ChevronUp,
+  HelpCircle,
   LogIn,
   LogOut,
+  Menu,
   MessageCircle,
   Moon,
   Plus,
   Send,
+  Shield,
+  Sparkles,
   Sun,
   User,
   X
@@ -43,6 +48,62 @@ type Theme = {
 const translations = {
   ru: {
     title: "Be Heard.",
+    landingSubtitle: "AI-наставники и спокойное пространство для разговора — в вашем темпе и без осуждения.",
+    landingPrimaryCta: "Начать диалог",
+    landingSecondaryCta: "Выбрать наставника",
+    landingFeature1Title: "Персональные наставники",
+    landingFeature1Text: "Выбирайте готовых персонажей или создавайте собственного наставника под ваш стиль общения.",
+    landingFeature2Title: "История и прогресс",
+    landingFeature2Text: "Сохраняйте чаты и возвращайтесь к важным инсайтам в любой момент.",
+    landingFeature3Title: "Поддержка в кризисе",
+    landingFeature3Text: "При необходимости можно перейти к сессии с реальным специалистом.",
+    landingStatMentors: "наставников",
+    landingStatFree: "сообщений для старта",
+    landingStatLanguages: "языков интерфейса",
+    navFeatures: "Возможности",
+    navHow: "Как это работает",
+    navTrust: "Безопасность",
+    navFaq: "FAQ",
+    navStart: "Начать",
+    navMenu: "Меню",
+    heroEyebrow: "Платформа эмоциональной поддержки",
+    sectionFeaturesTitle: "Почему Be Heard",
+    sectionHowTitle: "Как это работает",
+    sectionTrustTitle: "Конфиденциальность",
+    sectionFaqTitle: "Частые вопросы",
+    howStep1Title: "Выберите наставника",
+    howStep1Text: "Готовые персонажи или собственный наставник под ваш стиль.",
+    howStep2Title: "Пишите в своём темпе",
+    howStep2Text: "Без давления: отвечайте, когда вам комфортно.",
+    howStep3Title: "Сохраняйте историю",
+    howStep3Text: "С аккаунтом чаты хранятся в облаке и доступны с любого устройства.",
+    howStep4Title: "Человек рядом",
+    howStep4Text: "При необходимости можно обсудить дополнительную поддержку со специалистом.",
+    trust1Title: "Вы контролируете диалог",
+    trust1Text: "Делитесь тем, что готовы раскрыть, в удобном формате.",
+    trust2Title: "Гибкость",
+    trust2Text: "Темы и глубина общения — на ваших условиях.",
+    trust3Title: "Все функции в одном месте",
+    trust3Text: "Чат, история и настройки профиля — в одном интерфейсе.",
+    faq1Q: "Это замена психологу?",
+    faq1A: "Нет. ИИ дополняет поддержку; в кризисе важна помощь специалиста.",
+    faq2Q: "Нужен ли аккаунт?",
+    faq2A: "Гостевой режим возможен; аккаунт сохраняет историю чатов между визитами.",
+    faq3Q: "Где настройки профиля?",
+    faq3A: "В правом верхнем углу после входа — иконка профиля и параметры.",
+    faq4Q: "Какие языки интерфейса?",
+    faq4A: "Русский, қазақша и English — переключатель вверху страницы.",
+    footerTagline: "Be Heard — пространство для честного разговора.",
+    footerExplore: "Разделы",
+    footerContact: "Контакты",
+    footerContactSoon: "Контактные данные — вскоре",
+    footerLegal: "Информация",
+    footerDisclaimer: "Сервис не заменяет экстренную медицинскую помощь.",
+    footerCopyright: "© 2026 Be Heard",
+    ctaTitle: "Готовы начать?",
+    ctaSubtitle: "Выберите наставника и откройте диалог.",
+    ctaButton: "К наставникам",
+    backToTop: "Наверх",
     begin: "Начать путь",
     back: "Назад",
     selectMentor: "Выберите наставника",
@@ -75,6 +136,62 @@ const translations = {
   },
   kz: {
     title: "Be Heard.",
+    landingSubtitle: "AI-тәлімгерлер және сөйлесуге арналған тыныш кеңістік — өз қарқыңызбен, айыптаусыз.",
+    landingPrimaryCta: "Диалогты бастау",
+    landingSecondaryCta: "Тәлімгерді таңдау",
+    landingFeature1Title: "Жеке тәлімгерлер",
+    landingFeature1Text: "Дайын кейіпкерлерді таңдаңыз немесе өзіңізге сай тәлімгер жасаңыз.",
+    landingFeature2Title: "Тарих және прогресс",
+    landingFeature2Text: "Чаттарды сақтап, маңызды ойларға кез келген уақытта қайта оралыңыз.",
+    landingFeature3Title: "Дағдарыс кезіндегі қолдау",
+    landingFeature3Text: "Қажет болса, нақты маманмен сессияға ауыса аласыз.",
+    landingStatMentors: "тәлімгер",
+    landingStatFree: "бастапқы хабарлама",
+    landingStatLanguages: "интерфейс тілі",
+    navFeatures: "Мүмкіндіктер",
+    navHow: "Қалай жұмыс істейді",
+    navTrust: "Қауіпсіздік",
+    navFaq: "FAQ",
+    navStart: "Бастау",
+    navMenu: "Мәзір",
+    heroEyebrow: "Эмоциялық қолдау платформасы",
+    sectionFeaturesTitle: "Неге Be Heard",
+    sectionHowTitle: "Қалай жұмыс істейді",
+    sectionTrustTitle: "Құпиялылық",
+    sectionFaqTitle: "Жиі қойылатын сұрақтар",
+    howStep1Title: "Тәлімгерді таңдаңыз",
+    howStep1Text: "Дайын кейіпкерлер немесе өз стиліңізге сай тәлімгер.",
+    howStep2Title: "Өз қарқыныңызбен жазыңыз",
+    howStep2Text: "Қысымсыз: ыңғайлы уақытта жауап беріңіз.",
+    howStep3Title: "Тарихты сақтаңыз",
+    howStep3Text: "Аккаунтпен чаттар бұлтта сақталады.",
+    howStep4Title: "Адам қасыңызда",
+    howStep4Text: "Қажет болса — маманмен қосымша қолдау туралы сөйлесуге болады.",
+    trust1Title: "Диалогты сіз басқарасыз",
+    trust1Text: "Бөлісетініңізді өзіңіз шешесіз.",
+    trust2Title: "Икемділік",
+    trust2Text: "Тақырып пен тереңдік — сіздің шарттарыңызбен.",
+    trust3Title: "Барлығы бір орында",
+    trust3Text: "Чат, тарих және профиль баптаулары — бір интерфейсте.",
+    faq1Q: "Бұл психологтың орнына ма?",
+    faq1A: "Жоқ. AI қолдауды толықтырады; дағдарыста маман маңызды.",
+    faq2Q: "Аккаунт керек пе?",
+    faq2A: "Қонақ режимі бар; аккаунт чат тарихын сақтайды.",
+    faq3Q: "Профиль баптаулары қайда?",
+    faq3A: "Кіруден кейін оң жоғарғы бұрышта — профиль белгішесі.",
+    faq4Q: "Қандай тілдер бар?",
+    faq4A: "Орыс, қазақ және ағылшын — жоғарыдағы ауыстырғыш.",
+    footerTagline: "Be Heard — шын сөйлесу орны.",
+    footerExplore: "Бөлімдер",
+    footerContact: "Байланыс",
+    footerContactSoon: "Байланыс деректері жақында",
+    footerLegal: "Ақпарат",
+    footerDisclaimer: "Қызмет жедел медициналық көмектің орнын баспайды.",
+    footerCopyright: "© 2026 Be Heard",
+    ctaTitle: "Бастаймыз ба?",
+    ctaSubtitle: "Тәлімгерді таңдап, диалогты ашыңыз.",
+    ctaButton: "Тәлімгерлерге",
+    backToTop: "Жоғарыға",
     begin: "Жолды бастау",
     back: "Артқа",
     selectMentor: "Тәлімгерді таңдаңыз",
@@ -107,6 +224,62 @@ const translations = {
   },
   en: {
     title: "Be Heard.",
+    landingSubtitle: "AI mentors and a calm space to talk—at your pace, without judgment.",
+    landingPrimaryCta: "Start Chatting",
+    landingSecondaryCta: "Choose a Mentor",
+    landingFeature1Title: "Personal Mentors",
+    landingFeature1Text: "Pick from ready personas or create your own mentor tailored to your style.",
+    landingFeature2Title: "History and Progress",
+    landingFeature2Text: "Keep your conversations and return to meaningful insights anytime.",
+    landingFeature3Title: "Crisis Support",
+    landingFeature3Text: "When needed, escalate to a real specialist session directly from the app.",
+    landingStatMentors: "mentors",
+    landingStatFree: "starter messages",
+    landingStatLanguages: "interface languages",
+    navFeatures: "Features",
+    navHow: "How it works",
+    navTrust: "Safety",
+    navFaq: "FAQ",
+    navStart: "Start",
+    navMenu: "Menu",
+    heroEyebrow: "A space for emotional support",
+    sectionFeaturesTitle: "Why Be Heard",
+    sectionHowTitle: "How it works",
+    sectionTrustTitle: "Privacy",
+    sectionFaqTitle: "FAQ",
+    howStep1Title: "Pick a mentor",
+    howStep1Text: "Choose a persona or build your own mentor.",
+    howStep2Title: "Write at your pace",
+    howStep2Text: "No pressure—reply when it feels right.",
+    howStep3Title: "Keep your history",
+    howStep3Text: "With an account, chats sync securely for return visits.",
+    howStep4Title: "Human support",
+    howStep4Text: "When you need it, you can explore options for speaking with a specialist.",
+    trust1Title: "You steer the dialogue",
+    trust1Text: "Share what you are ready to share, on your terms.",
+    trust2Title: "Flexibility",
+    trust2Text: "Topics and depth follow your needs.",
+    trust3Title: "Everything in one place",
+    trust3Text: "Chat, history, and profile settings live in one simple interface.",
+    faq1Q: "Is this a replacement for therapy?",
+    faq1A: "No. AI complements support; crises need professional help.",
+    faq2Q: "Do I need an account?",
+    faq2A: "You can try as a guest; an account saves your chat history across visits.",
+    faq3Q: "Where are profile settings?",
+    faq3A: "After sign-in, use the profile icon in the top-right corner.",
+    faq4Q: "Which languages?",
+    faq4A: "Russian, Kazakh, and English—use the switcher at the top.",
+    footerTagline: "Be Heard — a place for honest conversation.",
+    footerExplore: "Explore",
+    footerContact: "Contact",
+    footerContactSoon: "Contact details coming soon",
+    footerLegal: "Legal",
+    footerDisclaimer: "Not a substitute for emergency medical care.",
+    footerCopyright: "© 2026 Be Heard",
+    ctaTitle: "Ready to begin?",
+    ctaSubtitle: "Choose a mentor and open the conversation.",
+    ctaButton: "Go to mentors",
+    backToTop: "Back to top",
     begin: "Begin Journey",
     back: "Back",
     selectMentor: "Choose a Mentor",
@@ -133,7 +306,9 @@ const translations = {
     subscriptionMessage: "Subscription required to continue chatting",
     subscribeNow: "Subscribe Now",
     freeMessagesLimit: "Free messages remaining",
-    viewChats: "Chat History"
+    viewChats: "Chat History",
+    settings: "Settings",
+    logout: "Log out"
   }
 }
 
@@ -322,9 +497,19 @@ export default function App() {
   const [userChats, setUserChats] = useState<Array<{ psych_id: string, last_message: string, message_count: number }>>([]);
   const [subscriptionResult, setSubscriptionResult] = useState<'success' | 'cancel' | null>(null);
   const [crisisResult, setCrisisResult] = useState<'success' | 'cancel' | null>(null);
+  const [landingMenuOpen, setLandingMenuOpen] = useState(false);
 
   const t = translations[lang];
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSection = (id: string) => {
+    setLandingMenuOpen(false);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  useEffect(() => {
+    if (view !== 'landing') setLandingMenuOpen(false);
+  }, [view]);
 
   // Навигация с поддержкой истории браузера
   const navigateToView = (newView: 'landing' | 'selection' | 'chat', psychId?: string) => {
@@ -767,7 +952,7 @@ export default function App() {
 
   return (
     <main
-      className="min-h-screen w-full flex flex-col items-center justify-center overflow-x-hidden relative transition-all duration-700 ease-in-out font-sans"
+      className={`min-h-screen w-full flex flex-col items-center overflow-x-hidden relative transition-all duration-700 ease-in-out font-sans ${view === 'landing' ? 'justify-start overflow-y-auto' : 'justify-center'}`}
       style={{
         background: currentTheme.colors.bgGradient || currentTheme.colors.bg,
         ['--text-color' as string]: currentTheme.colors.text,
@@ -853,14 +1038,319 @@ export default function App() {
 
       <AnimatePresence mode="wait">
         {view === 'landing' && (
-          <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center z-10 px-4 pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pt-0">
-            <h1 className="font-serif text-5xl sm:text-7xl md:text-9xl italic mb-6 sm:mb-8 tracking-tighter" style={{ color: 'var(--text-color)' }}>{t.title}</h1>
-            <button
-              onClick={() => navigateToView('selection')}
-              className="px-8 sm:px-12 py-4 sm:py-5 rounded-full border border-[var(--border-color)] text-[var(--text-muted)] uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[10px] hover:bg-[var(--card-hover)] transition-all"
-            >
-              {t.begin}
-            </button>
+          <motion.div
+            key="landing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="w-full z-10"
+          >
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-[calc(3.5rem+env(safe-area-inset-top,0px))] pb-0">
+              {/* Sticky landing navigation */}
+              <nav
+                className="sticky z-[35] -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 mb-4 sm:mb-6 flex items-center justify-between gap-2 border-b border-[var(--border-color)] bg-[var(--card-bg)]/75 backdrop-blur-xl rounded-b-xl sm:rounded-b-2xl"
+                style={{ top: 'calc(0.5rem + env(safe-area-inset-top, 0px))' }}
+                aria-label="Landing"
+              >
+                <button
+                  type="button"
+                  onClick={() => scrollToSection('hero')}
+                  className="font-serif text-base sm:text-lg italic tracking-tight shrink-0"
+                  style={{ color: 'var(--text-color)' }}
+                >
+                  Be Heard
+                </button>
+                <div className="hidden lg:flex items-center gap-5 xl:gap-6">
+                  {[
+                    ['features', t.navFeatures],
+                    ['how', t.navHow],
+                    ['trust', t.navTrust],
+                    ['faq', t.navFaq],
+                  ].map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => scrollToSection(id)}
+                      className="text-[9px] uppercase tracking-[0.18em] transition-opacity hover:opacity-100 opacity-70"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setLandingMenuOpen(false); navigateToView('selection'); }}
+                    className="hidden sm:inline-flex px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[9px] font-bold uppercase tracking-[0.18em] text-white transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: 'var(--accent-color)' }}
+                  >
+                    {t.navStart}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLandingMenuOpen((o) => !o)}
+                    className="lg:hidden p-1.5 rounded-full border border-[var(--border-color)] bg-black/10"
+                    style={{ color: 'var(--text-color)' }}
+                    aria-expanded={landingMenuOpen}
+                    aria-label={t.navMenu}
+                  >
+                    {landingMenuOpen ? <X size={16} /> : <Menu size={16} />}
+                  </button>
+                </div>
+              </nav>
+              {landingMenuOpen && (
+                <div className="lg:hidden -mt-1 mb-5 rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)]/95 backdrop-blur-md p-3 flex flex-col gap-0.5">
+                  {[
+                    ['features', t.navFeatures],
+                    ['how', t.navHow],
+                    ['trust', t.navTrust],
+                    ['faq', t.navFaq],
+                  ].map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => scrollToSection(id)}
+                      className="text-left py-2 px-2 rounded-lg text-xs uppercase tracking-wider"
+                      style={{ color: 'var(--text-color)' }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => { setLandingMenuOpen(false); navigateToView('selection'); }}
+                    className="mt-1.5 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-[0.18em] text-white"
+                    style={{ backgroundColor: 'var(--accent-color)' }}
+                  >
+                    {t.navStart}
+                  </button>
+                </div>
+              )}
+
+              {/* Hero */}
+              <section id="hero" className="scroll-mt-24 sm:scroll-mt-28 pb-12 sm:pb-16 md:pb-20">
+                <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.28em] mb-4 sm:mb-5" style={{ color: 'var(--accent-color)' }}>
+                  {t.heroEyebrow}
+                </p>
+                <h1
+                  className="font-serif italic tracking-tighter leading-[0.95] mb-4 sm:mb-6 max-w-[min(100%,20ch)] text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
+                  style={{ color: 'var(--text-color)' }}
+                >
+                  {t.title}
+                </h1>
+                <p className="text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mb-6 sm:mb-8 font-light" style={{ color: 'var(--text-muted)' }}>
+                  {t.landingSubtitle}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 mb-10 sm:mb-12">
+                  <button
+                    type="button"
+                    onClick={() => navigateToView('selection')}
+                    className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full text-white uppercase tracking-[0.2em] text-[10px] font-bold transition-all hover:opacity-90 shadow-md shadow-black/15"
+                    style={{ backgroundColor: 'var(--accent-color)', boxShadow: `0 12px 32px -12px var(--accent-glow)` }}
+                  >
+                    {t.landingPrimaryCta}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection('features')}
+                    className="px-6 sm:px-8 py-2.5 sm:py-3 rounded-full border border-[var(--border-color)] text-[var(--text-muted)] uppercase tracking-[0.2em] text-[10px] hover:bg-[var(--card-hover)] transition-all"
+                  >
+                    {t.landingSecondaryCta}
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-3xl">
+                  {[
+                    [String(psychs.length), t.landingStatMentors],
+                    ['5', t.landingStatFree],
+                    ['3', t.landingStatLanguages],
+                  ].map(([val, lab], i) => (
+                    <div
+                      key={i}
+                      className="rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)] p-4 sm:p-5 min-h-[88px] sm:min-h-[96px] flex flex-col justify-center"
+                    >
+                      <p className="text-2xl sm:text-3xl font-semibold tracking-tight mb-1" style={{ color: 'var(--text-color)' }}>
+                        {val}
+                      </p>
+                      <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.22em] leading-snug" style={{ color: 'var(--text-muted)' }}>
+                        {lab}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Features */}
+              <section id="features" className="scroll-mt-24 sm:scroll-mt-28 py-12 sm:py-16 md:py-20 border-t border-[var(--border-color)]">
+                <div className="flex items-end gap-2.5 mb-6 sm:mb-8">
+                  <Sparkles className="shrink-0 w-6 h-6 sm:w-7 sm:h-7" style={{ color: 'var(--accent-color)' }} aria-hidden />
+                  <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl italic tracking-tight" style={{ color: 'var(--text-color)' }}>
+                    {t.sectionFeaturesTitle}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                  {[
+                    [t.landingFeature1Title, t.landingFeature1Text],
+                    [t.landingFeature2Title, t.landingFeature2Text],
+                    [t.landingFeature3Title, t.landingFeature3Text],
+                  ].map(([title, text], i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl sm:rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)] p-5 sm:p-6 min-h-[180px] sm:min-h-[200px] flex flex-col justify-center"
+                    >
+                      <h3 className="font-serif text-lg sm:text-xl italic mb-2 sm:mb-3" style={{ color: 'var(--text-color)' }}>
+                        {title}
+                      </h3>
+                      <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                        {text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* How it works */}
+              <section id="how" className="scroll-mt-24 sm:scroll-mt-28 py-12 sm:py-16 md:py-20 border-t border-[var(--border-color)]">
+                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl italic mb-8 sm:mb-10 md:mb-12 tracking-tight" style={{ color: 'var(--text-color)' }}>
+                  {t.sectionHowTitle}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 lg:gap-8">
+                  {[
+                    ['1', t.howStep1Title, t.howStep1Text],
+                    ['2', t.howStep2Title, t.howStep2Text],
+                    ['3', t.howStep3Title, t.howStep3Text],
+                    ['4', t.howStep4Title, t.howStep4Text],
+                  ].map(([num, title, text]) => (
+                    <div key={num} className="flex gap-3 sm:gap-4">
+                      <span
+                        className="font-serif text-3xl sm:text-4xl italic opacity-30 shrink-0 leading-none pt-0.5"
+                        style={{ color: 'var(--accent-color)' }}
+                      >
+                        {num}
+                      </span>
+                      <div>
+                        <h3 className="font-serif text-base sm:text-lg italic mb-1.5" style={{ color: 'var(--text-color)' }}>
+                          {title}
+                        </h3>
+                        <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                          {text}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Trust */}
+              <section id="trust" className="scroll-mt-24 sm:scroll-mt-28 py-12 sm:py-16 md:py-20 border-t border-[var(--border-color)]">
+                <div className="flex items-center gap-2.5 mb-6 sm:mb-8">
+                  <Shield className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" style={{ color: 'var(--accent-color)' }} aria-hidden />
+                  <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl italic tracking-tight" style={{ color: 'var(--text-color)' }}>
+                    {t.sectionTrustTitle}
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                  {[
+                    [t.trust1Title, t.trust1Text],
+                    [t.trust2Title, t.trust2Text],
+                    [t.trust3Title, t.trust3Text],
+                  ].map(([title, text], i) => (
+                    <div key={i} className="rounded-xl border border-[var(--border-color)] bg-[var(--card-bg)]/80 p-4 sm:p-5">
+                      <h3 className="font-serif text-sm sm:text-base italic mb-1.5" style={{ color: 'var(--text-color)' }}>{title}</h3>
+                      <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{text}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* FAQ */}
+              <section id="faq" className="scroll-mt-24 sm:scroll-mt-28 py-12 sm:py-16 md:py-20 border-t border-[var(--border-color)]">
+                <div className="flex items-center gap-2.5 mb-6 sm:mb-8">
+                  <HelpCircle className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" style={{ color: 'var(--accent-color)' }} aria-hidden />
+                  <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl italic tracking-tight" style={{ color: 'var(--text-color)' }}>
+                    {t.sectionFaqTitle}
+                  </h2>
+                </div>
+                <div className="max-w-2xl space-y-5 sm:space-y-6">
+                  {[
+                    [t.faq1Q, t.faq1A],
+                    [t.faq2Q, t.faq2A],
+                    [t.faq3Q, t.faq3A],
+                    [t.faq4Q, t.faq4A],
+                  ].map(([q, a], i) => (
+                    <div key={i} className="border-b border-[var(--border-color)] pb-5 last:border-0">
+                      <p className="font-serif text-sm sm:text-base italic mb-1.5" style={{ color: 'var(--text-color)' }}>{q}</p>
+                      <p className="text-xs sm:text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{a}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* CTA */}
+              <section id="cta" className="scroll-mt-24 sm:scroll-mt-28 py-12 sm:py-16 md:py-20 mb-6 border-t border-[var(--border-color)]">
+                <div className="rounded-2xl sm:rounded-3xl border border-[var(--border-color)] bg-[var(--card-bg)] px-5 sm:px-8 py-10 sm:py-12 md:py-14 text-center max-w-2xl mx-auto">
+                  <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl italic mb-3 sm:mb-4" style={{ color: 'var(--text-color)' }}>{t.ctaTitle}</h2>
+                  <p className="text-sm sm:text-base mb-6 sm:mb-7 max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>{t.ctaSubtitle}</p>
+                  <button
+                    type="button"
+                    onClick={() => navigateToView('selection')}
+                    className="px-7 sm:px-9 py-2.5 sm:py-3 rounded-full text-white uppercase tracking-[0.2em] text-[10px] font-bold"
+                    style={{ backgroundColor: 'var(--accent-color)' }}
+                  >
+                    {t.ctaButton}
+                  </button>
+                </div>
+              </section>
+
+              {/* Site footer */}
+              <footer className="border-t border-[var(--border-color)] pt-10 sm:pt-12 pb-20 sm:pb-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mb-10">
+                  <div className="lg:col-span-2">
+                    <p className="font-serif text-xl sm:text-2xl italic mb-2" style={{ color: 'var(--text-color)' }}>Be Heard</p>
+                    <p className="text-xs sm:text-sm max-w-md leading-relaxed" style={{ color: 'var(--text-muted)' }}>{t.footerTagline}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--text-muted)' }}>{t.footerExplore}</p>
+                    <ul className="space-y-1.5">
+                      {[
+                        ['features', t.navFeatures],
+                        ['how', t.navHow],
+                        ['trust', t.navTrust],
+                        ['faq', t.navFaq],
+                      ].map(([id, lab]) => (
+                        <li key={id}>
+                          <button type="button" onClick={() => scrollToSection(id)} className="text-xs hover:opacity-100 opacity-80 transition-opacity" style={{ color: 'var(--text-color)' }}>
+                            {lab}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--text-muted)' }}>{t.footerContact}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{t.footerContactSoon}</p>
+                    <p className="text-[9px] uppercase tracking-[0.2em] mt-5 mb-1" style={{ color: 'var(--text-muted)' }}>{t.footerLegal}</p>
+                    <p className="text-[11px] leading-relaxed opacity-80" style={{ color: 'var(--text-muted)' }}>{t.footerDisclaimer}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-[var(--border-color)]">
+                  <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] opacity-60" style={{ color: 'var(--text-muted)' }}>
+                    {t.footerCopyright}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="inline-flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-[var(--border-color)] hover:bg-[var(--card-hover)] transition-colors"
+                    style={{ color: 'var(--text-color)' }}
+                  >
+                    <ChevronUp size={14} /> {t.backToTop}
+                  </button>
+                </div>
+                <p className="text-center mt-8 text-[8px] sm:text-[9px] uppercase tracking-[0.4em] opacity-25 pointer-events-none" style={{ color: 'var(--text-color)' }}>
+                  {t.breathe}
+                </p>
+              </footer>
+            </div>
           </motion.div>
         )}
 
@@ -1151,7 +1641,9 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <footer className="fixed bottom-[calc(0.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
+      {view !== 'landing' && (
+        <footer className="fixed bottom-[calc(0.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
+      )}
     </main>
   )
 }
