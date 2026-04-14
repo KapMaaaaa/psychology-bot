@@ -132,7 +132,9 @@ const translations = {
     freeMessagesLimit: "Free messages remaining",
     viewChats: "Chat History",
     settings: "Settings",
-    logout: "Logout"
+    logout: "Logout",
+    privacyPolicy: "Политика конфиденциальности",
+    termsOfUse: "Пользовательское соглашение"
   },
   kz: {
     title: "Be Heard.",
@@ -220,7 +222,9 @@ const translations = {
     freeMessagesLimit: "Тегін хабарламалар қалды",
     viewChats: "Чат тарихы",
     settings: "Параметрлер",
-    logout: "Шығу"
+    logout: "Шығу",
+    privacyPolicy: "Құпиялылық саясаты",
+    termsOfUse: "Пайдаланушы келісімі"
   },
   en: {
     title: "Be Heard.",
@@ -308,7 +312,9 @@ const translations = {
     freeMessagesLimit: "Free messages remaining",
     viewChats: "Chat History",
     settings: "Settings",
-    logout: "Log out"
+    logout: "Log out",
+    privacyPolicy: "Privacy Policy",
+    termsOfUse: "Terms of Service"
   }
 }
 
@@ -1330,6 +1336,26 @@ export default function App() {
                     <p className="text-[9px] uppercase tracking-[0.25em] mb-2" style={{ color: 'var(--text-muted)' }}>{t.footerContact}</p>
                     <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{t.footerContactSoon}</p>
                     <p className="text-[9px] uppercase tracking-[0.2em] mt-5 mb-1" style={{ color: 'var(--text-muted)' }}>{t.footerLegal}</p>
+                    <div className="flex flex-col gap-1">
+                      <a
+                        href="/legal/privacy-policy.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] leading-relaxed opacity-90 hover:opacity-100 underline"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {t.privacyPolicy}
+                      </a>
+                      <a
+                        href="/legal/terms-of-service.html"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] leading-relaxed opacity-90 hover:opacity-100 underline"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {t.termsOfUse}
+                      </a>
+                    </div>
                     <p className="text-[11px] leading-relaxed opacity-80" style={{ color: 'var(--text-muted)' }}>{t.footerDisclaimer}</p>
                   </div>
                 </div>

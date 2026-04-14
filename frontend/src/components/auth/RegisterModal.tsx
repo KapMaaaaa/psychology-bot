@@ -262,6 +262,30 @@ export default function RegisterModal({
           {loading ? t.loading : t.sendCode}
         </button>
 
+        <p className="text-xs text-center leading-relaxed" style={{ color: theme.colors.textMuted }}>
+          {t.legalNotice}{' '}
+          <a
+            href="/legal/privacy-policy.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:opacity-80"
+            style={{ color: theme.colors.text }}
+          >
+            {t.privacyPolicy}
+          </a>{' '}
+          {lang === 'en' ? 'and' : lang === 'kz' ? 'және' : 'и'}{' '}
+          <a
+            href="/legal/terms-of-service.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:opacity-80"
+            style={{ color: theme.colors.text }}
+          >
+            {t.termsOfUse}
+          </a>
+          .
+        </p>
+
         <button
           type="button"
           onClick={onSwitchToLogin}

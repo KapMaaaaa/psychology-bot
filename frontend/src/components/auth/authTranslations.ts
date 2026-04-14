@@ -42,6 +42,9 @@ export type AuthTranslation = {
   usernameInvalid: string
   codeRequired: string
   continueWithGoogle: string
+  legalNotice: string
+  privacyPolicy: string
+  termsOfUse: string
 }
 
 export const authTranslations: Record<Language, AuthTranslation> = {
@@ -75,7 +78,10 @@ export const authTranslations: Record<Language, AuthTranslation> = {
     usernameTooShort: 'Имя пользователя должно содержать минимум 3 символа',
     usernameInvalid: 'Имя пользователя должно содержать только буквы и цифры',
     codeRequired: 'Введите 6-значный код подтверждения',
-    continueWithGoogle: 'Войти через Google'
+    continueWithGoogle: 'Войти через Google',
+    legalNotice: 'Продолжая, вы принимаете',
+    privacyPolicy: 'Политику конфиденциальности',
+    termsOfUse: 'Пользовательское соглашение'
   },
   kz: {
     login: 'Кіру',
@@ -107,7 +113,10 @@ export const authTranslations: Record<Language, AuthTranslation> = {
     usernameTooShort: 'Пайдаланушы аты кемінде 3 таңбадан тұруы керек',
     usernameInvalid: 'Пайдаланушы аты тек әріптер мен сандардан тұруы керек',
     codeRequired: '6 таңбалы растау кодын енгізіңіз',
-    continueWithGoogle: 'Google арқылы кіру'
+    continueWithGoogle: 'Google арқылы кіру',
+    legalNotice: 'Жалғастыра отырып, сіз',
+    privacyPolicy: 'Құпиялылық саясатын',
+    termsOfUse: 'Пайдаланушы келісімін'
   },
   en: {
     login: 'Login',
@@ -139,6 +148,9 @@ export const authTranslations: Record<Language, AuthTranslation> = {
     usernameTooShort: 'Username must be at least 3 characters',
     usernameInvalid: 'Username must contain only letters and numbers',
     codeRequired: 'Enter the 6-digit verification code',
-    continueWithGoogle: 'Continue with Google'
+    continueWithGoogle: 'Continue with Google',
+    legalNotice: 'By continuing, you agree to the',
+    privacyPolicy: 'Privacy Policy',
+    termsOfUse: 'Terms of Service'
   }
 }
