@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       port: 3000,
+      allowedHosts: ['beheard.asia', 'www.beheard.asia'],
       ...(dockerDev && {
         watch: { usePolling: true, interval: 1000 },
         hmr: { clientPort: 3000 }
