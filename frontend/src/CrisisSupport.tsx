@@ -58,17 +58,17 @@ interface CrisisSupportProps {
       cardBg: string
     }
   }
-  token: string | null
+  isAuthenticated: boolean
 }
 
-export default function CrisisSupport({ lang, onClose, onContinue, theme, token }: CrisisSupportProps) {
+export default function CrisisSupport({ lang, onClose, onContinue, theme, isAuthenticated }: CrisisSupportProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showScheduling, setShowScheduling] = useState(false)
   const t = translations[lang]
 
   const handleBookSession = async () => {
-    if (!token) {
+    if (!isAuthenticated) {
       setError("Please log in first")
       return
     }
@@ -80,9 +80,9 @@ export default function CrisisSupport({ lang, onClose, onContinue, theme, token 
       const response = await fetch(`${API_BASE_URL}/crisis/session/create`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       })
 
       const data = await response.json()
@@ -147,7 +147,7 @@ export default function CrisisSupport({ lang, onClose, onContinue, theme, token 
         <div className="space-y-3">
           <button
             onClick={handleBookSession}
-            disabled={loading || !token}
+            disabled={loading || !isAuthenticated}
             className="w-full py-4 rounded-full text-white uppercase tracking-widest text-[10px] font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             style={{ backgroundColor: theme.colors.accent }}
           >

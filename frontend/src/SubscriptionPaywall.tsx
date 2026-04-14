@@ -72,7 +72,7 @@ interface SubscriptionPaywallProps {
       cardBg: string
     }
   }
-  token: string | null
+  isAuthenticated: boolean
   messageCount?: number
   freeLimit?: number
 }
@@ -81,7 +81,7 @@ export default function SubscriptionPaywall({
   lang,
   onClose,
   theme,
-  token,
+  isAuthenticated,
   messageCount,
   freeLimit = 5,
 }: SubscriptionPaywallProps) {
@@ -90,7 +90,7 @@ export default function SubscriptionPaywall({
   const t = translations[lang]
 
   const handleSubscribe = async () => {
-    if (!token) {
+    if (!isAuthenticated) {
       setError("Please log in first")
       return
     }
@@ -100,9 +100,7 @@ export default function SubscriptionPaywall({
 
     try {
       const response = await fetch(`${API_BASE_URL}/subscription/create`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include'
       })
 
       const data = await response.json()
@@ -136,14 +134,14 @@ export default function SubscriptionPaywall({
           </div>
           <button
             onClick={() => {
-              if (messageCount !== undefined && messageCount >= freeLimit && token !== null) {
+              if (messageCount !== undefined && messageCount >= freeLimit && isAuthenticated) {
                 return;
               }
               onClose();
             }}
             className="p-2 hover:bg-white/5 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             style={{ color: theme.colors.textMuted }}
-            disabled={messageCount !== undefined && messageCount >= freeLimit && token !== null}
+            disabled={messageCount !== undefined && messageCount >= freeLimit && isAuthenticated}
           >
             <X size={20} />
           </button>
@@ -185,7 +183,7 @@ export default function SubscriptionPaywall({
           </button>
           <button
             onClick={handleSubscribe}
-            disabled={loading || !token}
+            disabled={loading || !isAuthenticated}
             className="flex-1 py-4 rounded-full text-white uppercase tracking-widest text-[10px] font-bold transition-all disabled:opacity-50"
             style={{ backgroundColor: theme.colors.accent }}
           >

@@ -35,6 +35,7 @@ export default function VerifyCodeModal({
     const response = await fetch(`${API_BASE_URL}/send-verification-code`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email: pending.email })
     })
     const data = await response.json().catch(() => ({}))
@@ -73,6 +74,7 @@ export default function VerifyCodeModal({
       const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           email: pending.email,
           username: pending.username,

@@ -577,12 +577,10 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [psychs]);
 
-  const loadSubscriptionStatus = async (authToken: string) => {
+  const loadSubscriptionStatus = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/subscription/status`, {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
+        credentials: 'include'
       });
       if (response.ok) {
         const data = await response.json();
@@ -600,9 +598,7 @@ export default function App() {
     }
     try {
       const response = await fetch(`${API_BASE_URL}/chat/list`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include'
       });
       if (response.ok) {
         const data = await response.json();
@@ -638,9 +634,7 @@ export default function App() {
   const loadChatHistory = async (psychId: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/chat/history?psych_id=${psychId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        credentials: 'include'
       });
       if (response.ok) {
         const data = await response.json();
@@ -673,16 +667,19 @@ export default function App() {
     }
   }, []);
 
-  // Load user from localStorage on mount
+  // Restore user session from HttpOnly cookie on mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('auth_user');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-      // Load subscription status
-      loadSubscriptionStatus(savedToken);
-    }
+    fetch(`${API_BASE_URL}/me`, { credentials: 'include' })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const me = await response.json();
+        setUser({ id: me.id, username: me.username });
+        setToken('cookie-session');
+        loadSubscriptionStatus();
+      })
+      .catch(() => {
+        // ignore: guest mode
+      });
   }, []);
 
   // Check URL for subscription/crisis results on mount
@@ -697,23 +694,14 @@ export default function App() {
         setSubscriptionResult('success');
         // Clean URL
         window.history.replaceState({}, '', '/');
-        // Verify and create subscription if needed
-        const savedToken = localStorage.getItem('auth_token') || token;
-        if (savedToken) {
-          // Verify session and create subscription
-          fetch(`${API_BASE_URL}/subscription/verify?session_id=${sessionId}`, {
-            headers: {
-              'Authorization': `Bearer ${savedToken}`
-            }
-          }).then(() => {
-            // Reload subscription status after verification
-            loadSubscriptionStatus(savedToken);
-          }).catch((error) => {
-            console.error('Failed to verify subscription:', error);
-            // Still reload status in case webhook already processed it
-            loadSubscriptionStatus(savedToken);
-          });
-        }
+        fetch(`${API_BASE_URL}/subscription/verify?session_id=${sessionId}`, {
+          credentials: 'include'
+        }).then(() => {
+          loadSubscriptionStatus();
+        }).catch((error) => {
+          console.error('Failed to verify subscription:', error);
+          loadSubscriptionStatus();
+        });
       }
     } else if (pathname === '/subscription/cancel') {
       setSubscriptionResult('cancel');
@@ -764,13 +752,12 @@ export default function App() {
     }
   };
 
-  const handleAuthSuccess = (authToken: string, userId: number, username: string) => {
-    setToken(authToken);
+  const handleAuthSuccess = (_authToken: string, userId: number, username: string) => {
+    // Token is stored by backend in HttpOnly cookie.
+    setToken('cookie-session');
     setUser({ id: userId, username });
-    localStorage.setItem('auth_token', authToken);
-    localStorage.setItem('auth_user', JSON.stringify({ id: userId, username }));
     setShowGuestReminder(false);
-    loadSubscriptionStatus(authToken);
+    loadSubscriptionStatus();
     loadUserChats();
     // Перезагружаем историю чата из БД
     if (selectedPsych) {
@@ -779,11 +766,15 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
-    setMessages([]);
+    fetch(`${API_BASE_URL}/logout`, { method: 'POST', credentials: 'include' })
+      .catch(() => {
+        // ignore network errors for client state cleanup
+      })
+      .finally(() => {
+        setToken(null);
+        setUser(null);
+        setMessages([]);
+      });
   };
 
   const addCustomPsych = () => {
@@ -841,14 +832,10 @@ export default function App() {
     }
 
     try {
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           history: updatedHistory,
           psych_id: selectedPsych?.id ?? 'psychologist',
@@ -1491,7 +1478,7 @@ export default function App() {
             onClose={() => setShowCrisisSupport(false)}
             onContinue={() => setShowCrisisSupport(false)}
             theme={currentTheme}
-            token={token}
+            isAuthenticated={!!token}
           />
         )}
 
@@ -1503,7 +1490,7 @@ export default function App() {
             onClose={() => {
               setSubscriptionResult(null);
               if (subscriptionResult === 'success' && token) {
-                loadSubscriptionStatus(token);
+                loadSubscriptionStatus();
               }
             }}
             onGoToSettings={() => {
@@ -1527,10 +1514,10 @@ export default function App() {
             lang={lang}
             onClose={() => setShowAccountSettings(false)}
             theme={currentTheme}
-            token={token}
+            isAuthenticated={!!token}
             onSubscriptionUpdate={() => {
               if (token) {
-                loadSubscriptionStatus(token);
+                loadSubscriptionStatus();
               }
             }}
           />

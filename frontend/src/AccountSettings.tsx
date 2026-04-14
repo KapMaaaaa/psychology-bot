@@ -91,11 +91,11 @@ interface AccountSettingsProps {
             cardBg: string
         }
     }
-    token: string | null
+    isAuthenticated: boolean
     onSubscriptionUpdate?: () => void
 }
 
-export default function AccountSettings({ lang, onClose, theme, token, onSubscriptionUpdate }: AccountSettingsProps) {
+export default function AccountSettings({ lang, onClose, theme, isAuthenticated, onSubscriptionUpdate }: AccountSettingsProps) {
     const [subscriptionStatus, setSubscriptionStatus] = useState<{ status: string, expires_at: string | null } | null>(null)
     const [loading, setLoading] = useState(false)
     const [subscribeLoading, setSubscribeLoading] = useState(false)
@@ -105,18 +105,16 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
     const t = translations[lang]
 
     useEffect(() => {
-        if (token) {
+        if (isAuthenticated) {
             loadSubscriptionStatus()
         }
-    }, [token])
+    }, [isAuthenticated])
 
     const loadSubscriptionStatus = async () => {
-        if (!token) return
+        if (!isAuthenticated) return
         try {
             const response = await fetch(`${API_BASE_URL}/subscription/status`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                credentials: 'include'
             })
             if (response.ok) {
                 const data = await response.json()
@@ -128,7 +126,7 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
     }
 
     const handleSubscribe = async () => {
-        if (!token) return
+        if (!isAuthenticated) return
 
         setSubscribeLoading(true)
         setError('')
@@ -137,9 +135,9 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
             const response = await fetch(`${API_BASE_URL}/subscription/create`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             })
 
             const data = await response.json()
@@ -157,7 +155,7 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
     }
 
     const handleReactivate = async () => {
-        if (!token) return
+        if (!isAuthenticated) return
 
         setReactivateLoading(true)
         setError('')
@@ -166,9 +164,9 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
             const response = await fetch(`${API_BASE_URL}/subscription/reactivate`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             })
 
             const data = await response.json()
@@ -195,7 +193,7 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
     }
 
     const handleCancelSubscription = async () => {
-        if (!token) return
+        if (!isAuthenticated) return
 
         setLoading(true)
         setError('')
@@ -204,9 +202,9 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
             const response = await fetch(`${API_BASE_URL}/subscription/cancel`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                credentials: 'include'
             })
 
             const data = await response.json()
@@ -313,7 +311,7 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
                                 {(subscriptionStatus.status === 'cancelled' || subscriptionStatus.status === 'expired') && (
                                     <button
                                         onClick={handleReactivate}
-                                        disabled={reactivateLoading || !token}
+                                        disabled={reactivateLoading || !isAuthenticated}
                                         className="mt-4 w-full py-3 rounded-full uppercase tracking-widest text-[10px] font-bold text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                         style={{ backgroundColor: theme.colors.accent }}
                                     >
@@ -342,7 +340,7 @@ export default function AccountSettings({ lang, onClose, theme, token, onSubscri
                                 </p>
                                 <button
                                     onClick={handleSubscribe}
-                                    disabled={subscribeLoading || !token}
+                                    disabled={subscribeLoading || !isAuthenticated}
                                     className="w-full py-3 rounded-full uppercase tracking-widest text-[10px] font-bold text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                     style={{ backgroundColor: theme.colors.accent }}
                                 >

@@ -19,8 +19,8 @@ import security
 import stripe
 import uvicorn
 from database import SessionLocal, get_db, init_db
-from fastapi import (BackgroundTasks, Depends, FastAPI, HTTPException, Request,
-                     status)
+from fastapi import (BackgroundTasks, Cookie, Depends, FastAPI, HTTPException,
+                     Request, Response, status)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -70,6 +70,44 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 app = FastAPI()
 
+AUTH_COOKIE_NAME = "bh_access_token"
+AUTH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60
+AUTH_COOKIE_SECURE = os.getenv("COOKIE_SECURE", "0") == "1"
+AUTH_COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax")
+
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+RATE_LIMIT_DEFAULT_PER_WINDOW = int(os.getenv("RATE_LIMIT_DEFAULT_PER_WINDOW", "60"))
+RATE_LIMIT_RULES = {
+    "/login": int(os.getenv("RATE_LIMIT_LOGIN_PER_WINDOW", "10")),
+    "/send-verification-code": int(os.getenv("RATE_LIMIT_VERIFY_SEND_PER_WINDOW", "5")),
+    "/register": int(os.getenv("RATE_LIMIT_REGISTER_PER_WINDOW", "5")),
+    "/auth/google": int(os.getenv("RATE_LIMIT_GOOGLE_PER_WINDOW", "10")),
+    "/chat": int(os.getenv("RATE_LIMIT_CHAT_PER_WINDOW", "30")),
+}
+_rate_limit_store: dict[tuple[str, str], tuple[int, datetime]] = {}
+
+
+def _set_auth_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        key=AUTH_COOKIE_NAME,
+        value=token,
+        httponly=True,
+        secure=AUTH_COOKIE_SECURE,
+        samesite=AUTH_COOKIE_SAMESITE,
+        max_age=AUTH_COOKIE_MAX_AGE,
+        path="/",
+    )
+
+
+def _clear_auth_cookie(response: Response) -> None:
+    response.delete_cookie(
+        key=AUTH_COOKIE_NAME,
+        path="/",
+        httponly=True,
+        secure=AUTH_COOKIE_SECURE,
+        samesite=AUTH_COOKIE_SAMESITE,
+    )
+
 # Инициализация БД при старте
 
 
@@ -89,23 +127,75 @@ async def startup_event():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-site"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "img-src 'self' data: https:; "
+        "script-src 'self' https://accounts.google.com; "
+        "style-src 'self' 'unsafe-inline'; "
+        "connect-src 'self' https:; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'"
+    )
+    if request.url.scheme == "https":
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    path = request.url.path
+    if request.method in {"POST", "PUT", "PATCH"}:
+        limit = RATE_LIMIT_RULES.get(path, RATE_LIMIT_DEFAULT_PER_WINDOW)
+        ip = request.client.host if request.client else "unknown"
+        now = datetime.utcnow()
+        key = (ip, path)
+        count, window_start = _rate_limit_store.get(key, (0, now))
+        if (now - window_start).total_seconds() > RATE_LIMIT_WINDOW_SECONDS:
+            count = 0
+            window_start = now
+        count += 1
+        _rate_limit_store[key] = (count, window_start)
+        if count > limit:
+            return JSONResponse(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                content={"detail": "Too many requests. Please try again later."},
+            )
+        # lightweight cleanup to avoid unlimited growth
+        if len(_rate_limit_store) > 5000:
+            for rk, (_, ts) in list(_rate_limit_store.items()):
+                if (now - ts).total_seconds() > RATE_LIMIT_WINDOW_SECONDS * 2:
+                    _rate_limit_store.pop(rk, None)
+    return await call_next(request)
+
 # Security
-security_scheme = HTTPBearer()
+security_scheme = HTTPBearer(auto_error=False)
 
 # Dependency для получения текущего пользователя
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
+    auth_cookie: str | None = Cookie(default=None, alias=AUTH_COOKIE_NAME),
     db: Session = Depends(get_db)
 ):
     try:
-        token = credentials.credentials
+        token = credentials.credentials if credentials else auth_cookie
         if not token:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -219,6 +309,7 @@ async def verify_email(
 @app.post("/register", response_model=schemas.Token)
 async def register(
     user_data: schemas.UserRegisterEnhanced,
+    response: Response,
     db: Session = Depends(get_db)
 ):
     """Регистрация с проверкой кода подтверждения"""
@@ -269,6 +360,7 @@ async def register(
 
     # Создание токена
     access_token = security.create_access_token(data={"sub": user.id})
+    _set_auth_cookie(response, access_token)
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -278,7 +370,11 @@ async def register(
 
 
 @app.post("/login", response_model=schemas.Token)
-async def login(user_data: schemas.UserLogin, db: Session = Depends(get_db)):
+async def login(
+    user_data: schemas.UserLogin,
+    response: Response,
+    db: Session = Depends(get_db)
+):
     user = crud.authenticate_user(db, user_data.email, user_data.password)
     if not user:
         raise HTTPException(
@@ -288,6 +384,7 @@ async def login(user_data: schemas.UserLogin, db: Session = Depends(get_db)):
         )
 
     access_token = security.create_access_token(data={"sub": user.id})
+    _set_auth_cookie(response, access_token)
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -303,6 +400,12 @@ async def get_me(current_user=Depends(get_current_user)):
         "email": current_user.email,
         "username": current_user.username
     }
+
+
+@app.post("/logout")
+async def logout(response: Response):
+    _clear_auth_cookie(response)
+    return {"message": "Logged out"}
 
 
 @app.get("/auth/google/url")
@@ -321,7 +424,11 @@ async def get_google_auth_url():
 
 
 @app.post("/auth/google", response_model=schemas.Token)
-async def google_auth(auth_data: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+async def google_auth(
+    auth_data: schemas.GoogleAuthRequest,
+    response: Response,
+    db: Session = Depends(get_db)
+):
     """Google OAuth callback handler"""
     try:
         client_id = os.getenv("GOOGLE_CLIENT_ID")
@@ -354,6 +461,7 @@ async def google_auth(auth_data: schemas.GoogleAuthRequest, db: Session = Depend
 
         # Create token
         access_token = security.create_access_token(data={"sub": user.id})
+        _set_auth_cookie(response, access_token)
         return {
             "access_token": access_token,
             "token_type": "bearer",

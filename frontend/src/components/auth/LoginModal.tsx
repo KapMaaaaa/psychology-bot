@@ -72,6 +72,7 @@ export default function LoginModal({
               const authResponse = await fetch(`${API_BASE_URL}/auth/google`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ id_token: idToken })
               })
 
@@ -94,6 +95,7 @@ export default function LoginModal({
           const authResponse = await fetch(`${API_BASE_URL}/auth/google`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ id_token: event.data.id_token })
           })
 
@@ -136,6 +138,7 @@ export default function LoginModal({
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       })
 

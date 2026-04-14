@@ -84,6 +84,7 @@ export default function RegisterModal({
       const response = await fetch(`${API_BASE_URL}/send-verification-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email })
       })
 
