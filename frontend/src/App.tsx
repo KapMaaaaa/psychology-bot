@@ -945,7 +945,7 @@ export default function App() {
 
   return (
     <main
-      className={`min-h-screen w-full flex flex-col items-center overflow-x-hidden relative transition-all duration-700 ease-in-out font-sans ${view === 'landing' ? 'justify-start overflow-y-auto' : 'justify-center'}`}
+      className={`min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden relative transition-all duration-700 ease-in-out font-sans ${view === 'landing' ? 'justify-start overflow-y-auto' : 'justify-center'}`}
       style={{
         background: currentTheme.colors.bgGradient || currentTheme.colors.bg,
         ['--text-color' as string]: currentTheme.colors.text,
