@@ -19,8 +19,6 @@ import {
 import React, { useEffect, useRef, useState } from 'react'
 import AccountSettings from './AccountSettings'
 import Auth from './Auth'
-import CrisisResult from './CrisisResult'
-import CrisisSupport from './CrisisSupport'
 import SubscriptionResult from './SubscriptionResult'
 import { API_BASE_URL } from './config'
 import MarkdownRenderer from './MarkdownRenderer'
@@ -56,7 +54,7 @@ const translations = {
     landingFeature2Title: "История и прогресс",
     landingFeature2Text: "Сохраняйте чаты и возвращайтесь к важным инсайтам в любой момент.",
     landingFeature3Title: "Поддержка в кризисе",
-    landingFeature3Text: "При необходимости можно перейти к сессии с реальным специалистом.",
+    landingFeature3Text: "При необходимости бот подскажет обратиться к реальному специалисту.",
     landingStatMentors: "наставников",
     landingStatFree: "сообщений для старта",
     landingStatLanguages: "языков интерфейса",
@@ -146,7 +144,7 @@ const translations = {
     landingFeature2Title: "Тарих және прогресс",
     landingFeature2Text: "Чаттарды сақтап, маңызды ойларға кез келген уақытта қайта оралыңыз.",
     landingFeature3Title: "Дағдарыс кезіндегі қолдау",
-    landingFeature3Text: "Қажет болса, нақты маманмен сессияға ауыса аласыз.",
+    landingFeature3Text: "Қажет болса, бот нақты маманға жүгінуді ұсынады.",
     landingStatMentors: "тәлімгер",
     landingStatFree: "бастапқы хабарлама",
     landingStatLanguages: "интерфейс тілі",
@@ -236,7 +234,7 @@ const translations = {
     landingFeature2Title: "History and Progress",
     landingFeature2Text: "Keep your conversations and return to meaningful insights anytime.",
     landingFeature3Title: "Crisis Support",
-    landingFeature3Text: "When needed, escalate to a real specialist session directly from the app.",
+    landingFeature3Text: "When needed, the bot will suggest reaching out to a real specialist.",
     landingStatMentors: "mentors",
     landingStatFree: "starter messages",
     landingStatLanguages: "interface languages",
@@ -496,13 +494,11 @@ export default function App() {
   const [user, setUser] = useState<{ id: number, username: string } | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [showGuestReminder, setShowGuestReminder] = useState(false);
-  const [showCrisisSupport, setShowCrisisSupport] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<{ status: string, expires_at: string | null } | null>(null);
   const [messageCount, setMessageCount] = useState(0);
   const [showChatHistory, setShowChatHistory] = useState(false);
   const [userChats, setUserChats] = useState<Array<{ psych_id: string, last_message: string, message_count: number }>>([]);
   const [subscriptionResult, setSubscriptionResult] = useState<'success' | 'cancel' | null>(null);
-  const [crisisResult, setCrisisResult] = useState<'success' | 'cancel' | null>(null);
   const [landingMenuOpen, setLandingMenuOpen] = useState(false);
 
   const t = translations[lang];
@@ -682,7 +678,7 @@ export default function App() {
       });
   }, []);
 
-  // Check URL for subscription/crisis results on mount
+  // Check URL for subscription results on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const pathname = window.location.pathname;
@@ -709,19 +705,6 @@ export default function App() {
       window.history.replaceState({}, '', '/');
     }
 
-    // Handle crisis results
-    if (pathname === '/crisis/success') {
-      const sessionId = urlParams.get('session_id');
-      if (sessionId) {
-        setCrisisResult('success');
-        // Clean URL
-        window.history.replaceState({}, '', '/');
-      }
-    } else if (pathname === '/crisis/cancel') {
-      setCrisisResult('cancel');
-      // Clean URL
-      window.history.replaceState({}, '', '/');
-    }
   }, []); // Run only once on mount
 
   useEffect(() => {
@@ -902,38 +885,6 @@ export default function App() {
         if (done) break;
         const chunk = decoder.decode(value);
         await revealChunk(chunk);
-      }
-
-      // Check if bot suggested psychologist (bot will say it in response)
-      // Only show crisis support if bot explicitly mentions the session offer
-      const crisisIndicators = [
-        '1999',
-        'сессия',
-        'session',
-        'профессиональный психолог',
-        'professional psychologist',
-        'реальному психологу',
-        'психотерапевту',
-        'real psychologist',
-      ];
-      const hasCrisisOffer = crisisIndicators.some(indicator =>
-        accumulatedText.toLowerCase().includes(indicator.toLowerCase())
-      );
-
-      // Also check for explicit crisis language in bot's response
-      const explicitCrisisPhrases = [
-        'важно обратиться',
-        'критической ситуации',
-        'критическая ситуация',
-        'important to seek',
-        'critical situation'
-      ];
-      const hasExplicitCrisis = explicitCrisisPhrases.some(phrase =>
-        accumulatedText.toLowerCase().includes(phrase.toLowerCase())
-      );
-
-      if (hasCrisisOffer && hasExplicitCrisis) {
-        setTimeout(() => setShowCrisisSupport(true), 1500);
       }
 
     } catch (error) {
@@ -1472,16 +1423,6 @@ export default function App() {
         )}
 
 
-        {showCrisisSupport && (
-          <CrisisSupport
-            lang={lang}
-            onClose={() => setShowCrisisSupport(false)}
-            onContinue={() => setShowCrisisSupport(false)}
-            theme={currentTheme}
-            isAuthenticated={!!token}
-          />
-        )}
-
         {subscriptionResult && (
           <SubscriptionResult
             lang={lang}
@@ -1497,15 +1438,6 @@ export default function App() {
               setSubscriptionResult(null);
               setShowAccountSettings(true);
             }}
-          />
-        )}
-
-        {crisisResult && (
-          <CrisisResult
-            lang={lang}
-            theme={currentTheme}
-            type={crisisResult}
-            onClose={() => setCrisisResult(null)}
           />
         )}
 
