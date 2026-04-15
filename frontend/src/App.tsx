@@ -399,7 +399,7 @@ type Psychologist = {
 
 const DEFAULT_PSYCHOLOGISTS: Psychologist[] = [
   { id: 'conor', name: 'Конор Макгрегор', specialty: 'Мотивация', initials: 'КМ', gradient: 'from-orange-500 to-red-600', image: 'https://i.pinimg.com/1200x/47/b5/f1/47b5f127e6fb07577ff159288d6b20be.jpg' },
-  { id: 'naruto', name: 'Обычный чел', specialty: 'Поддержка', initials: 'ОЧ', gradient: 'from-yellow-400 to-orange-500', image: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
+  { id: 'naruto', name: 'Простой человек', specialty: 'Поддержка', initials: 'ПЧ', gradient: 'from-yellow-400 to-orange-500', image: 'https://cdn-icons-png.flaticon.com/512/149/149071.png' },
   { id: 'ronaldo', name: 'Криштиану Роналду', specialty: 'Дисциплина', initials: 'КР', gradient: 'from-red-500 to-purple-600', image: 'https://i.pinimg.com/originals/5f/6d/e5/5f6de5b18f033fd2226ed07b9784b820.jpg' },
   { id: 'pro', name: 'Профессионал', specialty: 'Психология', initials: 'ПР', gradient: 'from-blue-400 to-indigo-600', image: 'https://i.pinimg.com/736x/62/d5/9e/62d59ed14cc28b96dff137ba84ea9b38.jpg' },
 ]
