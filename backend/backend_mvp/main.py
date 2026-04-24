@@ -2,10 +2,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
 from typing import Optional
+import os
 import re
 
 app = FastAPI()
 client = OpenAI()
+PRIMARY_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1")
+FALLBACK_MODEL = os.getenv("OPENAI_FALLBACK_MODEL", "gpt-4.1-mini")
 
 class ChatRequest(BaseModel):
     message: str
@@ -100,10 +103,18 @@ def build_prompt(mode, message, previous_message=None):
 def chat(req: ChatRequest):
     prompt = build_prompt(req.mode, req.message, req.previous_message)
 
-    response = client.chat.completions.create(
-        model="gpt-5.1-mini",
-        messages=[{"role": "user", "content": prompt}],
-        max_completion_tokens=220
-    )
+    try:
+        response = client.chat.completions.create(
+            model=PRIMARY_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            max_completion_tokens=220
+        )
+    except Exception:
+        # Fallback keeps the API alive if the primary model is unavailable.
+        response = client.chat.completions.create(
+            model=FALLBACK_MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            max_completion_tokens=220
+        )
 
     return {"response": response.choices[0].message.content}
