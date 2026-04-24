@@ -319,6 +319,13 @@ html {
 
 /* Responsive design */
 @media (max-width: 768px) {
+  /* iOS Safari zooms focused inputs below 16px */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
   .keyboard-hint {
     display: none;
   }

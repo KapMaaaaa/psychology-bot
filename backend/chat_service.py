@@ -2,6 +2,7 @@
 
 import logging
 import os
+import re
 from typing import AsyncGenerator, List, Optional
 
 from fastapi import BackgroundTasks
@@ -36,6 +37,40 @@ def get_last_user_message_text(messages: List[Message]) -> str:
         if m.role == "user":
             return m.content
     return ""
+
+
+def _detect_language(last_user_text: str, requested_lang: str) -> str:
+    """
+    Выбираем язык ответа:
+    - если фронт явно передал ru/en/es/... (не auto), уважаем это;
+    - иначе определяем по последнему user-сообщению (простая эвристика).
+    """
+    explicit = (requested_lang or "").strip().lower()
+    if explicit and explicit != "auto":
+        return explicit
+
+    text = (last_user_text or "").strip()
+    if not text:
+        return "same-as-user"
+
+    # Кириллица -> чаще всего русский
+    if re.search(r"[а-яА-ЯёЁ]", text):
+        return "ru"
+    # Латиница (без кириллицы) -> по умолчанию английский
+    if re.search(r"[a-zA-Z]", text):
+        return "en"
+    return "same-as-user"
+
+
+def _should_ask_follow_up_question(messages: List[Message]) -> bool:
+    """
+    Убираем «допрос»: не задаём вопрос в каждом ответе.
+    Если прошлый bot-ответ уже заканчивался вопросом, в текущем ходе вопрос запрещаем.
+    """
+    for m in reversed(messages):
+        if m.role == "bot":
+            return not m.content.strip().endswith("?")
+    return True
 
 
 def save_bot_message(
@@ -183,9 +218,21 @@ async def generate_stream(
             psych_id, custom_desc if custom_desc else "Профессиональный наставник"
         )
 
+        last_user_text = get_last_user_message_text(messages)
+        effective_lang = _detect_language(last_user_text, lang)
+        can_ask_question = _should_ask_follow_up_question(messages)
+
+        question_rule = (
+            "Можно задать максимум ОДИН короткий уточняющий вопрос и только если это действительно помогает."
+            if can_ask_question
+            else "В ЭТОМ ответе НЕ задавай вопрос пользователю. Дай поддержку/мысль без вопросительного предложения."
+        )
+
         system_content = (
             f"{mode_prompt}\n\n"
-            f"{CORE_SYSTEM_PROMPT}\nЛичность: {personality}\nЯзык общения: {lang}.\n\n"
+            f"{CORE_SYSTEM_PROMPT}\nЛичность: {personality}\n"
+            f"Язык ответа: {effective_lang}. Если язык неясен, отвечай на языке последнего сообщения пользователя.\n"
+            f"{question_rule}\n\n"
             "ВАЖНО: Не используй markdown форматирование (символы **, __, и т.д.). "
             "Отвечай обычным текстом без форматирования."
         )

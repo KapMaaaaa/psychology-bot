@@ -32,7 +32,8 @@ class ChatRequest(BaseModel):
     # Если фронт не прислал (undefined в JSON), не падаем 422 — дефолтная личность
     psych_id: str = "psychologist"
     custom_desc: Optional[str] = None
-    lang: str = "ru"
+    # "auto" позволяет подстроиться под язык пользователя по последнему сообщению
+    lang: str = "auto"
 
 
 class UserRegisterEnhanced(BaseModel):

@@ -500,6 +500,7 @@ export default function App() {
   const [userChats, setUserChats] = useState<Array<{ psych_id: string, last_message: string, message_count: number }>>([]);
   const [subscriptionResult, setSubscriptionResult] = useState<'success' | 'cancel' | null>(null);
   const [landingMenuOpen, setLandingMenuOpen] = useState(false);
+  const [keyboardInset, setKeyboardInset] = useState(0);
 
   const t = translations[lang];
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -720,6 +721,26 @@ export default function App() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, selectedPsych, token]);
 
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+
+    const updateKeyboardInset = () => {
+      // На мобильных при открытии клавиатуры visualViewport становится ниже innerHeight.
+      const inset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+      setKeyboardInset(inset);
+    };
+
+    updateKeyboardInset();
+    viewport.addEventListener('resize', updateKeyboardInset);
+    viewport.addEventListener('scroll', updateKeyboardInset);
+
+    return () => {
+      viewport.removeEventListener('resize', updateKeyboardInset);
+      viewport.removeEventListener('scroll', updateKeyboardInset);
+    };
+  }, []);
+
   const handleToggleMode = () => {
     const newMode = mode === 'light' ? 'dark' : 'light';
     setMode(newMode);
@@ -906,6 +927,7 @@ export default function App() {
         ['--border-color' as string]: currentTheme.colors.border,
         ['--card-bg' as string]: currentTheme.colors.cardBg,
         ['--card-hover' as string]: currentTheme.colors.cardHover,
+        ['--keyboard-inset' as string]: `${keyboardInset}px`,
       } as React.CSSProperties & Record<string, string>}
     >
       {/* Controls: Mode & Language */}
@@ -1380,7 +1402,14 @@ export default function App() {
               {isLoading && <div className="text-[10px] animate-pulse uppercase tracking-widest opacity-30" style={{ color: 'var(--text-color)' }}>{t.thinking}</div>}
             </div>
 
-            <div className="p-4 sm:p-6 bg-black/5">
+            <div
+              className="p-4 sm:p-6 bg-black/5"
+              style={{
+                paddingBottom: keyboardInset > 0
+                  ? `calc(1rem + env(safe-area-inset-bottom, 0px) + var(--keyboard-inset))`
+                  : undefined
+              }}
+            >
               {(subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token) && (
                 <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20">
                   <p className="text-xs text-center" style={{ color: 'var(--text-color)' }}>
@@ -1393,7 +1422,7 @@ export default function App() {
                   value={input} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
                   onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSend())}
                   placeholder={t.placeholder}
-                  className="chat-composer-textarea flex-1 bg-transparent border-none px-4 sm:px-6 py-3 sm:py-4 outline-none text-sm resize-none disabled:opacity-50 rounded-[1.5rem] sm:rounded-[2rem] overflow-x-hidden overflow-y-auto"
+                  className="chat-composer-textarea flex-1 bg-transparent border-none px-4 sm:px-6 py-3 sm:py-4 outline-none text-[16px] sm:text-sm resize-none disabled:opacity-50 rounded-[1.5rem] sm:rounded-[2rem] overflow-x-hidden overflow-y-auto"
                   style={{ color: 'var(--text-color)' }}
                   disabled={subscriptionStatus?.status !== 'active' && messageCount >= 5 && !!token}
                 />
@@ -1587,7 +1616,15 @@ export default function App() {
       </AnimatePresence>
 
       {view !== 'landing' && (
-        <footer className="fixed bottom-[calc(0.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none" style={{ color: 'var(--text-color)' }}>{t.breathe}</footer>
+        <footer
+          className="fixed sm:bottom-8 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] sm:tracking-[0.5em] opacity-20 pointer-events-none"
+          style={{
+            bottom: `calc(0.5rem + env(safe-area-inset-bottom, 0px) + var(--keyboard-inset))`,
+            color: 'var(--text-color)'
+          }}
+        >
+          {t.breathe}
+        </footer>
       )}
     </main>
   )
