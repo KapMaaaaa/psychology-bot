@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from openai import OpenAI
+from typing import Optional
 import re
 
 app = FastAPI()
@@ -9,7 +10,7 @@ client = OpenAI()
 class ChatRequest(BaseModel):
     message: str
     mode: str  # support / analyst / hard
-    previous_message: str | None = None
+    previous_message: Optional[str] = None
 
 
 def detect_language(text: str) -> str:
